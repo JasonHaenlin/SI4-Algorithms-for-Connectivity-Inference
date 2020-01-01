@@ -16,13 +16,13 @@ def random_instance(p: int, t: int, vmin: int = 1, vmax: int = 100) -> list:
 
     Parameters
     ----------
-    p (int):
+    p: int
         numbers of vertices in each subcomplex
-    t (int):
+    t: int
         numbers of instaces to create
-    vmin (int) :
+    vmin: int
         min value range in the whole
-    vmax (int) :
+    vmax: int
         max value range in the whole
 
     Returns

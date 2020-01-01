@@ -33,23 +33,29 @@ class Vertex(object):
         """
         Parameters
         ----------
-        tag : int
+        tag: int
             the tag of the vertex represented as a number
-        adjacent : list[Vertex], optional
+        adjacent: list[Vertex], optional
             list of adjacents vertices
         """
 
         self._tag = tag
-        self._adjacent = adjacent
+        self._adjacent = self._validate_vertices(adjacent)
 
     def __hash__(self):
-        return hash(id(self))
+        return hash(self._tag)
 
     def __str__(self):
         return str(self._tag)
 
     def __repr__(self):
         return str(self._tag)
+
+    def __eq__(self, e):
+        return self._tag == e._tag
+
+    def _validate_vertices(self, vertices):
+        return [v for v in vertices if v != self]
 
     def append(self, v: Vertex):
         """append a new adjacent vertex
@@ -58,19 +64,34 @@ class Vertex(object):
 
         Parameters
         ----------
-        v : Vertex
+        v: Vertex
             new adjacent vertex to add
         """
 
         if v not in self._adjacent:
             self._adjacent.append(v)
+        return self
+
+    def set_adjacents(self, v: list[Vertex]):
+        """set the adjacent vertices for the vertex
+
+        this will reset the current vertices
+
+        Parameters
+        ----------
+        v: list[Vertex]
+            new adjacent vertices to add
+        """
+
+        self._adjacent = self._validate_vertices(v)
+        return self
 
     def remove(self, v: Vertex):
         """remove a adjacent vertex
 
         Parameters
         ----------
-        v : Vertex
+        v: Vertex
             adjacent vertex to remove
 
         Raises
@@ -80,15 +101,16 @@ class Vertex(object):
         """
 
         self._adjacent.remove(v)
+        return self
 
-    def adjacent_count(self) -> int:
+    def degree(self) -> int:
         """return the number of adjacents vertices
 
-        count the number of edges linked to the current node
+        count the number of edges linked to the current vertex
 
         Return
         ------
-        int :
+        int:
             count of edges
         """
 
