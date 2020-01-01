@@ -27,6 +27,8 @@ class Vertex(object):
         remove a existing vertex
     adjacent_count() -> int
         return the numbers of edges on that vertex
+    highest_degree_adjacent() -> Vertex
+        return the adjacent vertex with the highest degree
     """
 
     def __init__(self, tag: int, adjacent: list[Vertex] = []):
@@ -43,7 +45,7 @@ class Vertex(object):
         self._adjacent = self._validate_vertices(adjacent)
 
     def __hash__(self):
-        return hash(self._tag)
+        return hash(id(self))
 
     def __str__(self):
         return str(self._tag)
@@ -51,11 +53,12 @@ class Vertex(object):
     def __repr__(self):
         return str(self._tag)
 
-    def __eq__(self, e):
-        return self._tag == e._tag
-
     def _validate_vertices(self, vertices):
-        return [v for v in vertices if v != self]
+        a = {}
+        for v in vertices:
+            if v is not self:
+                a[v] = v
+        return [v for v in a.values()]
 
     def append(self, v: Vertex):
         """append a new adjacent vertex
@@ -115,3 +118,13 @@ class Vertex(object):
         """
 
         return len(self._adjacent)
+
+    def highest_degree_adjacent(self) -> Vertex:
+        """return the adjacent vertex with the highest degree
+
+        Returns
+        -------
+        Vertex:
+            highest degree vertex
+        """
+        return max(self._adjacent, key=lambda a: a.degree())
