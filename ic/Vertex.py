@@ -179,11 +179,11 @@ class Vertex(object):
 
 
     def get_adjacents(self) -> list:
-        """return the adjacents vertes in this Vertex
+        """return the adjacents vertices in this Vertex
 
         Returns
         -------
         list:
-            adjacents vertes in this Vertex
+            adjacents vertices in this Vertex
         """
         return self._adjacent
