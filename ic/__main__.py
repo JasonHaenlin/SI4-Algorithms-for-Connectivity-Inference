@@ -4,7 +4,15 @@
 # V1.2 2019/12/31 - Python 3.X
 
 import argparse
+from random import sample
 from sys import argv
+
+VMIN = 1
+VMAX = 100
+
+
+def random_instance(p, t):
+    return [sample(range(VMIN, VMAX+1), p) for _ in range(t)]
 
 
 def main():
@@ -27,7 +35,9 @@ def main():
     if args.vertex < 1 or args.vertex > 100:
         main_parser.error('--vertex should not be between 1 and 100')
 
-    print(args)
+    inst = random_instance(args.vertex, args.subcomplexes)
+
+    print(inst)
 
 
 if __name__ == "__main__":
