@@ -24,10 +24,11 @@ def compute(k: int, subcomplexes: list) -> list:
         a new graph or None if it is not possible
     """
 
-    if not is_degree_possible(vertices):
+    if not is_degree_possible(k, subcomplexes):
         return None
-    vertices = convert(subcomplexes)
-    return minimization(vertices)
+    subcomplexes = convert(subcomplexes)
+    graph = minimization(k, subcomplexes)
+    return unify(graph)
 
 
 def convert(subcomplexes: list) -> list:
@@ -50,7 +51,7 @@ def convert(subcomplexes: list) -> list:
             if flyweight.get(v, None) == None:
                 flyweight[v] = Vertex(v)
             vs.append(flyweight[v])
-        sets.append([v.set_adjacents(vs) for v in vs])
+        sets.append([v.append_all(vs) for v in vs])
     return sets
 
 
@@ -118,3 +119,30 @@ def reduce_degre(k: int, v: Vertex) -> bool:
         False if the vertex could not be reduced, True otherwise
 
     """
+    if v.degree() <= k:
+        return True
+    highest = v.highest_degree_adjacent()
+    if highest.degree() < 2:
+        return False
+    v.remove(highest)
+    return True
+
+
+def unify(subcomplexes: list) -> list:
+    """return a fully unified graph from the subsets
+
+    Parameters
+    ----------
+    subcomplexes: list
+        the list of sub graphes
+
+    Returns
+    -------
+    list:
+        the new graph
+    """
+    graph = {}
+    for sub in subcomplexes:
+        for v in sub:
+            graph[v] = v
+    return [v for v in graph.values()]

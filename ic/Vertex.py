@@ -42,19 +42,27 @@ class Vertex(object):
         """
 
         self._tag = tag
+        self._adjacent = []
         self._adjacent = self._validate_vertices(adjacent)
 
     def __hash__(self):
         return hash(id(self))
 
     def __str__(self):
-        return str(self._tag)
+        s = str(self._tag)
+        for v in self._adjacent:
+            s += "(" + str(v._tag) + ")"
+        if len(self._adjacent) < 1:
+            s += "()"
+        return s
 
     def __repr__(self):
-        return str(self._tag)
+        return str(self)
 
     def _validate_vertices(self, vertices):
         a = {}
+        for v in self._adjacent:
+            a[v] = v
         for v in vertices:
             if v is not self:
                 a[v] = v
@@ -69,10 +77,32 @@ class Vertex(object):
         ----------
         v: Vertex
             new adjacent vertex to add
+
+        Returns
+        -------
+        Vertex:
+            self
         """
 
         if v not in self._adjacent:
             self._adjacent.append(v)
+        return self
+
+    def append_all(self, v: list[Vertex]):
+        """add all the adjacents vertices to the vertex
+
+        Parameters
+        ----------
+        v: list[Vertex]
+            new adjacent vertices to add
+
+        Returns
+        -------
+        Vertex:
+            self
+        """
+
+        self._adjacent = self._validate_vertices(v)
         return self
 
     def set_adjacents(self, v: list[Vertex]):
@@ -84,8 +114,13 @@ class Vertex(object):
         ----------
         v: list[Vertex]
             new adjacent vertices to add
-        """
 
+        Returns
+        -------
+        Vertex:
+            self
+        """
+        self._adjacent = []
         self._adjacent = self._validate_vertices(v)
         return self
 
@@ -101,6 +136,11 @@ class Vertex(object):
         ------
         ValueError
             if no vertex of the hash exist
+
+        Returns
+        -------
+        Vertex:
+            self
         """
 
         self._adjacent.remove(v)
@@ -128,3 +168,13 @@ class Vertex(object):
             highest degree vertex
         """
         return max(self._adjacent, key=lambda a: a.degree())
+
+    def get_adjacents(self) -> list:
+        """return the adjacents vertes in this Vertex
+
+        Returns
+        -------
+        list:
+            adjacents vertes in this Vertex
+        """
+        return self._adjacent

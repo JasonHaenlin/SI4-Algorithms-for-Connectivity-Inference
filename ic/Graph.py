@@ -4,6 +4,8 @@
 # V1.0 2020/01/01 - Python 3.7
 
 
+# I do not know if this class will be of any use
+
 class Graph(object):
     """
     A class used to represent a whole graph

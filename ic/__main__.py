@@ -34,6 +34,18 @@ def random_instance(p: int, t: int, vmin: int = 1, vmax: int = 100) -> list:
     return [sample(range(vmin, vmax+1), p) for _ in range(t)]
 
 
+def verify_result(k: int, graph: list) ->bool:
+    """check if the builded graph is correct
+
+    Parameters
+    ----------
+    k: int
+        max degree of each vertex
+    graph: list
+        list of Vertices that represent the final graph
+    """
+
+
 def main():
     main_parser = argparse.ArgumentParser()
     main_parser.add_argument("-v",
