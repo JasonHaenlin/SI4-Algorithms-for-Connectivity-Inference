@@ -21,7 +21,8 @@ class Test(unittest.TestCase):
 
     def test_convert(self):
         vertices = convert([[1, 2, 3, 4], [2, 6, 7, 8]])
-        self.assertTrue(str(vertices[0][1]) == "2(1)(3)(4)", "Should be True")
+        self.assertTrue(str(vertices[0][1]) ==
+                        "2(1)(3)(4)(6)(7)(8)", "Should be True")
 
     def test_is_degree_possible(self):
         res = is_degree_possible(2, [[1, 2, 3, 4], [2, 6, 7, 8], [9, 1, 4, 6]])
@@ -30,26 +31,26 @@ class Test(unittest.TestCase):
     def test_reduce_degree(self):
         v1, v2, v3, v4 = Vertex(1), Vertex(2), Vertex(3), Vertex(4)
         v1.set_adjacents([v2, v3])
-        self.assertTrue(reduce_degre(2, v1), "Should be of a good degree")
+        self.assertTrue(reduce_degre(
+            2, v1, [v2, v3]), "Should be of a good degree")
         self.assertEqual(v1.degree(), 2, "Should not have been reduced")
-        self.assertTrue(reduce_degre(3, v1),
+        self.assertTrue(reduce_degre(3, v1, [v2, v3]),
                         "Should be of a bad degree and irreducible")
         v2.set_adjacents([v1, v2, v3])
-        self.assertTrue(reduce_degre(3, v1),
+        self.assertTrue(reduce_degre(3, v1, [v2, v3]),
                         "Should be of a bad degree but reductible")
         self.assertEqual(v1.degree(), 2, "Should have been reduced")
 
     def test_minimization(self):
-        # vertices = [[8, 5, 2, 9, 7],
-        #             [4, 1, 5, 6, 3],
-        #             [8, 1, 10, 9, 5],
-        #             [1, 10, 9, 4, 7],
-        #             [4, 7, 8, 6, 3]]
-        vertices = [[1, 2, 3],
-                    # [4, 5, 6],
-                    [1, 5, 6, 3]]
+        vertices = [
+            [8, 5, 2, 9, 7],
+            [4, 1, 5, 6, 3],
+            [8, 1, 10, 9, 5],
+            [1, 10, 9, 4, 7],
+            [4, 7, 8, 6, 3],
+        ]
         print(vertices)
-        result = compute(2, vertices)
+        result = compute(3, vertices)
         print(result)
 
 

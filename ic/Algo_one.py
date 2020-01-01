@@ -97,12 +97,12 @@ def minimization(k: int, subcomplexes: list) -> list:
     for sub in vertices:
         for v in sub:
             while v.degree() > k:
-                if reduce_degre(k, v) == False:
-                    return None
+                if reduce_degre(k, v, sub) == False:
+                    break
     return vertices
 
 
-def reduce_degre(k: int, v: Vertex) -> bool:
+def reduce_degre(k: int, v: Vertex, sub) -> bool:
     """reduce the vertex edges to fit the degre
 
     Parameters
@@ -110,8 +110,11 @@ def reduce_degre(k: int, v: Vertex) -> bool:
     k: int
         the degree to reach after the reduction
 
-    v : Vertex
+    v: Vertex
         the target vertex who need to be reduce
+
+    sub: list[Vertex]
+        pass the all subcomplexe to avoid touching the others
 
     Returns
     -------
@@ -121,10 +124,11 @@ def reduce_degre(k: int, v: Vertex) -> bool:
     """
     if v.degree() <= k:
         return True
-    highest = v.highest_degree_adjacent()
+    highest = v.highest_degree_adjacent(sub)
     if highest.degree() < 2:
         return False
     v.remove(highest)
+    highest.remove(v)
     return True
 
 
@@ -141,6 +145,8 @@ def unify(subcomplexes: list) -> list:
     list:
         the new graph
     """
+    if subcomplexes == None:
+        return None
     graph = {}
     for sub in subcomplexes:
         for v in sub:

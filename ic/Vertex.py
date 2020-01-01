@@ -159,15 +159,24 @@ class Vertex(object):
 
         return len(self._adjacent)
 
-    def highest_degree_adjacent(self) -> Vertex:
+    def highest_degree_adjacent(self, included: list[Vertex] = []) -> Vertex:
         """return the adjacent vertex with the highest degree
+
+        Parameters
+        ----------
+        included:
+            the vertices to include in the research (the other are excluded)
 
         Returns
         -------
         Vertex:
-            highest degree vertex
+            highest degree vertex from the included vertices
         """
-        return max(self._adjacent, key=lambda a: a.degree())
+        return max(self._adjacent, key=lambda a: a.degree() if a in included else 0)
+
+
+# lambda x: x and x.isdigit() and int(x) or None
+
 
     def get_adjacents(self) -> list:
         """return the adjacents vertes in this Vertex
