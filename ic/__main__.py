@@ -7,12 +7,24 @@ import argparse
 from random import sample
 from sys import argv
 
-VMIN = 1
-VMAX = 100
 
+def random_instance(p, t, vmin=1, vmax=100):
+    """Return the generate instances.
 
-def random_instance(p, t):
-    return [sample(range(VMIN, VMAX+1), p) for _ in range(t)]
+    Create t number of instances from vmin (included) to vmax (included).
+    Each instances contains p elements chose randomly
+
+    Parameters:
+    p (int): numbers of vertices in each subcomplex
+    t (int): numbers of instaces to create
+    vmin (int) : min value range in the whole
+    vmax (int) : max value range in the whole
+
+    Returns:
+    int[]: Array containing all the instances represented by Arrays of int
+
+    """
+    return [sample(range(vmin, vmax+1), p) for _ in range(t)]
 
 
 def main():
