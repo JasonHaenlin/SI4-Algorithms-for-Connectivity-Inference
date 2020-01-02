@@ -103,7 +103,7 @@ def minimization(k: int, subcomplexes: list) -> list:
 
 
 def reduce_degre(k: int, v: Vertex, sub) -> bool:
-    """reduce the vertex edges to fit the degre
+    """reduce the vertex edges to fit the degree
 
     Parameters
     ----------
@@ -124,7 +124,10 @@ def reduce_degre(k: int, v: Vertex, sub) -> bool:
     """
     if v.degree() <= k:
         return True
-    highest = v.highest_degree_adjacent(sub)
+    # highest = v.highest_degree_adjacent(sub)
+    highest = highest_removable_degree(v, sub)
+    if highest == None:
+        return False
     if highest.degree() < 2:
         return False
     v.remove(highest)
@@ -152,3 +155,51 @@ def unify(subcomplexes: list) -> list:
         for v in sub:
             graph[v] = v
     return [v for v in graph.values()]
+
+
+def highest_removable_degree(v: Vertex, sub) -> Vertex:
+    """return a node that can be remove
+
+    Search for a node that can be deleted
+
+    Parameters
+    ----------
+    v: Vertex
+        the target vertex who need to be reduce
+
+    sub: list[Vertex]
+        pass the all subcomplexe to avoid touching the others
+
+    Returns
+    -------
+    Vertex:
+        return a vertex that can be remove or None
+    """
+    included = sub.copy()
+    vertex_to_test = v.highest_degree_adjacent(included)
+    if vertex_to_test not in included:
+        return None
+    while not vertex_to_test.correctly_connected(v, included):
+        included.remove(vertex_to_test)
+        if len(included) < 1:
+            return None
+        vertex_to_test = v.highest_degree_adjacent(included)
+        if vertex_to_test not in included:
+            return None
+    return vertex_to_test
+
+
+def verify_result(k: int, inst: list, graph: list) ->bool:
+    """check if the builded graph is correct
+
+    Parameters
+    ----------
+    k: int
+        max degree of each vertex
+    inst: list
+        list of Vertices that represent the subcomplexes
+    graph: list
+        list of Vertices that represent the final graph
+    """
+
+    pass

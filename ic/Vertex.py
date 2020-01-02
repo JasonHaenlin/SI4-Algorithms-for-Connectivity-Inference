@@ -27,8 +27,12 @@ class Vertex(object):
         remove a existing vertex
     adjacent_count() -> int
         return the numbers of edges on that vertex
-    highest_degree_adjacent() -> Vertex
+    highest_degree_adjacent(included : list[Vertex]) -> Vertex
         return the adjacent vertex with the highest degree
+    get_adjacents() -> list[Vertex]
+        return the adjacents vertices in this Vertex
+    correctly_connected(dest_vertex: Vertex, included: list[Vertex] = []) -> bool
+        check if the self vertex have a path back to the destination vertex
     """
 
     def __init__(self, tag: int, adjacent: list[Vertex] = []):
@@ -67,6 +71,21 @@ class Vertex(object):
             if v is not self:
                 a[v] = v
         return [v for v in a.values()]
+
+    def _helper_correctly_connected(self, marked: dict, dest_vertex: Vertex, included: list[Vertex] = []) -> bool:
+        marked[self] = 1
+        marked[dest_vertex] += 1
+        if self.degree(included + [dest_vertex]) < 2:
+            return False
+
+        for a in (a for a in self._adjacent if a in included):
+            if a not in marked:
+                if a._helper_correctly_connected(marked, dest_vertex, included) == True:
+                    return True
+            elif a is dest_vertex and marked[dest_vertex] > 1:
+                return True
+
+        return False
 
     def append(self, v: Vertex):
         """append a new adjacent vertex
@@ -146,25 +165,31 @@ class Vertex(object):
         self._adjacent.remove(v)
         return self
 
-    def degree(self) -> int:
+    def degree(self, included: list[Vertex] = []) -> int:
         """return the number of adjacents vertices
 
         count the number of edges linked to the current vertex
+
+        Parameters
+        ----------
+        included: list[Vertex]
+            the vertices to include in the research (the other are excluded)
 
         Return
         ------
         int:
             count of edges
         """
-
-        return len(self._adjacent)
+        if len(included) == 0:
+            return len(self._adjacent)
+        return len([a for a in self._adjacent if a in included])
 
     def highest_degree_adjacent(self, included: list[Vertex] = []) -> Vertex:
         """return the adjacent vertex with the highest degree
 
         Parameters
         ----------
-        included:
+        included: list[Vertex]
             the vertices to include in the research (the other are excluded)
 
         Returns
@@ -173,10 +198,6 @@ class Vertex(object):
             highest degree vertex from the included vertices
         """
         return max(self._adjacent, key=lambda a: a.degree() if a in included else 0)
-
-
-# lambda x: x and x.isdigit() and int(x) or None
-
 
     def get_adjacents(self) -> list:
         """return the adjacents vertices in this Vertex
@@ -187,3 +208,24 @@ class Vertex(object):
             adjacents vertices in this Vertex
         """
         return self._adjacent
+
+    def correctly_connected(self, dest_vertex: Vertex, included: list[Vertex] = [])->bool:
+        """check if the self vertex have a path back to the destination vertex
+
+        Parameters
+        ----------
+        dest_vertex: Vertex
+            destination vertex where the path need to be find
+
+        included: list[Vertex]
+            the vertices to include in the research (the other are excluded)
+
+        Returns
+        -------
+        bool:
+            True if the vertex is correctly connected, False otherwise
+        """
+        to_check = included.copy()
+        marked = {}
+        marked[dest_vertex] = 0
+        return self._helper_correctly_connected(marked, dest_vertex, to_check)

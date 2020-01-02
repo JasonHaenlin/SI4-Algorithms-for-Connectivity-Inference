@@ -1,7 +1,7 @@
 import unittest
 
 from ic.Vertex import Vertex
-from ic.Algo_one import convert, is_degree_possible, reduce_degre, compute
+from ic.Algo_one import convert, is_degree_possible, reduce_degre, compute, highest_removable_degree
 
 
 class Test(unittest.TestCase):
@@ -40,6 +40,46 @@ class Test(unittest.TestCase):
         self.assertTrue(reduce_degre(3, v1, [v2, v3]),
                         "Should be of a bad degree but reductible")
         self.assertEqual(v1.degree(), 2, "Should have been reduced")
+
+    def test_correct_vertex(self):
+        v1, v2, v3 = Vertex(1), Vertex(2), Vertex(3)
+        v4, v5, v6 = Vertex(4), Vertex(5), Vertex(6)
+        vertices = [v1, v2, v3, v4, v5, v6]
+        v1.set_adjacents([v2, v3])
+        v2.set_adjacents([v1, v4])
+        v3.set_adjacents([v1])
+        v4.set_adjacents([v2, v5, v6])
+        v5.set_adjacents([v4])
+        v6.set_adjacents([v4])
+        self.assertFalse(v2.correctly_connected(
+            v1, vertices), "Should be bad connected")
+        v1.append(v5)
+        v5.append(v1)
+        self.assertTrue(v2.correctly_connected(
+            v1, vertices), "Should be connected correctly")
+
+    def test_highest_removable_degreee(self):
+        v1, v2, v3 = Vertex(1), Vertex(2), Vertex(3)
+        v4, v5, v6 = Vertex(4), Vertex(5), Vertex(6)
+        vertices = [v1, v2, v3, v4, v5, v6]
+        v1.set_adjacents([v2, v5, v6])
+        v2.set_adjacents([v1, v3, v4])
+        v3.set_adjacents([v2])
+        v4.set_adjacents([v2])
+        v5.set_adjacents([v1, v6])
+        v6.set_adjacents([v1, v5])
+
+        vertex = highest_removable_degree(v1, vertices)
+        self.assertTrue(vertex is v5 or vertex is v6,
+                        "Should be able to remove vertex 6 or 5")
+        v7 = Vertex(7)
+        v7.set_adjacents([v1, v3])
+        v1.append(v7)
+        v3.append(v7)
+
+        vertex = highest_removable_degree(v1, vertices)
+        self.assertTrue(vertex is v5 or vertex is v6,
+                        "Should be able to remove vertex 6 or 5")
 
     def test_minimization(self):
         vertices = [
