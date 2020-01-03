@@ -50,7 +50,7 @@ class Vertex(object):
         adjacents: list[Vertex], optional
             list of adjacents vertices
         """
-
+        self._weight = 1
         self._tag = tag
         self._links = []
         self._adjacents = []
@@ -65,6 +65,7 @@ class Vertex(object):
             s += "(" + str(v._tag) + ")"
         if len(self._adjacents) < 1:
             s += "()"
+        s += " : weight({})".format(self._weight)
         return s
 
     def __repr__(self):
@@ -79,6 +80,9 @@ class Vertex(object):
             if v is not self:
                 a[v] = v
         return [v for v in a.values()]
+
+    def _increment_weight(self) :
+        self._weight += 1
 
     def _is_there_a_path(self, vertex: Vertex, marked: dict, l: set) -> bool:
         """check for the current link, if a path back exist"""

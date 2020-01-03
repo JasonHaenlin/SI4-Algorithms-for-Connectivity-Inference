@@ -67,11 +67,15 @@ class Graph(object):
                 real_edge._increment_weight()
 
 
-    def _add_vertex_(self, v : Vertex) :
+    def _add_vertex_(self, v : Vertex, compute_weight : bool = False) :
         if not v :
             return
         if not self._has_vertex_(v) :
             self._vertices.append(Vertex(v._tag))
+        elif compute_weight :
+            real_vertex = self._get_vertex_(v)
+            if real_vertex :
+                real_vertex._increment_weight()
 
     def _add_all_vertices_(self, vertices : list) :
         for v in vertices :
@@ -79,14 +83,17 @@ class Graph(object):
 
     def _add_sub_graph_(self, graph : 'Graph') :
         for v in graph._vertices :
-            self._add_vertex_(v)
+            self._add_vertex_(v, compute_weight=True)
         for e in graph._edges :
             self._add_edge_(e=e, compute_weight=True)
 
     def _update_sub_graphs_weights_(self, sub_graphs : list) :
         for sg in sub_graphs :
             for edge in sg._edges :
-                edge._weight = self._get_edge_(edge._v1, edge._v2)._weight
+                real_edge = self._get_edge_(edge._v1, edge._v2)
+                edge._weight = real_edge._weight
+                edge._v1._weight = real_edge._v1._weight
+                edge._v2._weight = real_edge._v2._weight
 
     def _get_vertex_(self, v:Vertex) -> Vertex:
         if not v :
