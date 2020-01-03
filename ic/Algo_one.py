@@ -28,10 +28,8 @@ def compute(d: int, subcomplexes: list) -> list:
         return None
     subcomplexes = convert(subcomplexes)
     graph = unify(subcomplexes)
-    mini_graph = minimization_graph(d, graph)
-    # mini_graph = minimization_graph(d, mini_graph)
-    # graph = minimization(d, subcomplexes)
-    return graph
+    mini_graph = minimization(d, graph)
+    return mini_graph
 
 
 def convert(subcomplexes: list) -> list:
@@ -83,8 +81,22 @@ def is_degree_possible(d: int, subcomplexes: list) -> bool:
     return max(Counter(whole).items(), key=itemgetter(1))[1] <= d
 
 
-def minimization_graph(d: int, graph: list)-> list:
-    """just a test right now"""
+def minimization(d: int, graph: list)-> list:
+    """try to minimize the edges to reduce the delta to at least 'd'
+
+    Parameters
+    ----------
+    d: int
+        the minimal degre to reduce to
+
+    graph: list
+        the graph with the vertices
+
+    Returns
+    -------
+    list:
+        list of vertices minimized or None if no solution is found
+    """
     graph = graph.copy()
     reductible = True
     while reductible == True:
@@ -96,6 +108,23 @@ def minimization_graph(d: int, graph: list)-> list:
 
 
 def try_to_reduct(v: Vertex, graph):
+    """reduce the vertex edges to fit the degree
+
+    Parameters
+    ----------
+
+    v: Vertex
+        the target vertex who need to be reduce
+
+    graph: list[Vertex]
+        pass the all the graph
+
+    Returns
+    -------
+    bool:
+        False if the vertex could not be reduced, True otherwise
+
+    """
     highest = best_choice_to_remove(v, graph)
     if highest == None:
         return False
@@ -107,6 +136,21 @@ def try_to_reduct(v: Vertex, graph):
 
 
 def best_choice_to_remove(vertex: Vertex, graph) -> Vertex:
+    """try to minimize the edges to reduce the delta
+
+    Parameters
+    ----------
+    vertex: Vertex
+        the vertex to reduce
+
+    graph: list
+        the graph with the vertices
+
+    Returns
+    -------
+    list:
+        list of vertices minimized or None if no solution is found
+    """
     adj = vertex.get_adjacents()
     vertex_to_test = vertex.highest_degree_adjacent(
         included=adj,
@@ -115,67 +159,6 @@ def best_choice_to_remove(vertex: Vertex, graph) -> Vertex:
     if vertex.is_other_path_available(vertex_to_test) == False:
         return None
     return vertex_to_test
-
-
-def minimization(d: int, subcomplexes: list) -> list:
-    """try to minimize the edges to reduce the delta to at least 'd'
-
-    Parameters
-    ----------
-    d: int
-        the minimal degre to reduce to
-
-    subcomplexes: list
-        the list of sub graphes
-
-    Returns
-    -------
-    list:
-        list of vertices minimized or None if no solution is found
-    """
-
-    vertices = subcomplexes.copy()
-
-    cpt = 0
-    while cpt < len(vertices):
-        for v in vertices[cpt]:
-            while v.degree() > d:
-                if reduction(d, v, vertices[cpt]) == False:
-                    break
-        cpt += 1
-    return vertices
-
-
-def reduction(d: int, v: Vertex, sub) -> bool:
-    """reduce the vertex edges to fit the degree
-
-    Parameters
-    ----------
-    d: int
-        the degree to reach after the reduction
-
-    v: Vertex
-        the target vertex who need to be reduce
-
-    sub: list[Vertex]
-        pass the all subcomplexe to avoid touching the others
-
-    Returns
-    -------
-    bool:
-        False if the vertex could not be reduced, True otherwise
-
-    """
-    if v.degree() <= d:
-        return True
-    highest = highest_removable_degree(v, sub)
-    if highest == None:
-        return False
-    if highest.degree() < 2:
-        return False
-    v.remove(highest)
-    highest.remove(v)
-    return True
 
 
 def unify(subcomplexes: list) -> list:
@@ -198,38 +181,6 @@ def unify(subcomplexes: list) -> list:
         for v in sub:
             graph[v] = v
     return [v for v in graph.values()]
-
-
-def highest_removable_degree(v: Vertex, sub) -> Vertex:
-    """return a node that can be remove
-
-    Search for a node that can be deleted
-
-    Parameters
-    ----------
-    v: Vertex
-        the target vertex who need to be reduce
-
-    sub: list[Vertex]
-        pass the all subcomplexe to avoid touching the others
-
-    Returns
-    -------
-    Vertex:
-        return a vertex that can be remove or None
-    """
-    included = sub.copy()
-    vertex_to_test = v.highest_degree_adjacent(included)
-    if vertex_to_test not in included:
-        return None
-    while vertex_to_test.correctly_connected(v) == False:
-        included.remove(vertex_to_test)
-        if len(included) < 1:
-            return None
-        vertex_to_test = v.highest_degree_adjacent(included)
-        if vertex_to_test not in included:
-            return Nones
-    return vertex_to_test
 
 
 def verify_result(d: int, k: int, graph: list) ->bool:
@@ -266,6 +217,7 @@ def verify_result(d: int, k: int, graph: list) ->bool:
 
 
 def something_wrong(vo, vd):
+    """testing function to check if a separation between two nodes is fine"""
     vos = vo.get_adjacents()
     vos.remove(vd)
     vds = vd.get_adjacents()

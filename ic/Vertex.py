@@ -96,23 +96,6 @@ class Vertex(object):
         marked[self] -= 1
         return False
 
-    def _helper_correctly_connected(self, marked: dict, dest_vertex: Vertex, included: list[Vertex] = []) -> bool:
-        marked[self] = 1
-        marked[dest_vertex] += 1
-        if self.degree(included) < 2:
-            marked[dest_vertex] -= 1
-            return False
-
-        for a in (a for a in self._adjacents if a in included):
-            if a not in marked:
-                if a._helper_correctly_connected(marked, dest_vertex, included) == True:
-                    return True
-            elif a is dest_vertex and marked[dest_vertex] > 2:
-                return True
-
-        marked[dest_vertex] -= 1
-        return False
-
     def append(self, v: Vertex):
         """append a new adjacent vertex
 
@@ -233,6 +216,18 @@ class Vertex(object):
         return max(self._adjacents, key=lambda a: a.degree() if a in included and s(a) else 0)
 
     def is_other_path_available(self, vertex: Vertex) -> bool:
+        """check if the self vertex have a path back to the destination vertex
+
+        Parameters
+        ----------
+        vertex: Vertex
+            destination vertex where the path need to be find
+
+        Returns
+        -------
+        bool:
+            True if the vertex is correctly connected, False otherwise
+        """
         links = self.intersection(vertex)
         for l in links:
             marked = {}
@@ -250,27 +245,6 @@ class Vertex(object):
             adjacents vertices in this Vertex
         """
         return self._adjacents.copy()
-
-    def correctly_connected(self, dest_vertex: Vertex, included: list[Vertex] = [])->bool:
-        """check if the self vertex have a path back to the destination vertex
-
-        Parameters
-        ----------
-        dest_vertex: Vertex
-            destination vertex where the path need to be find
-
-        included: list[Vertex]
-            the vertices to include in the research (the other are excluded)
-
-        Returns
-        -------
-        bool:
-            True if the vertex is correctly connected, False otherwise
-        """
-        to_check = included.copy()
-        marked = {}
-        marked[dest_vertex] = 0
-        return self._helper_correctly_connected(marked, dest_vertex, to_check)
 
     def add_link(self, link: int):
         """add a new link
@@ -291,7 +265,3 @@ class Vertex(object):
     def intersection(self, vertex):
         """check if the links between two vertices are the same"""
         return set(self.links()).intersection(vertex.links())
-
-    def include(self, vertex):
-        """check if vertex is include in self"""
-        return set(self.links()).issuperset(vertex.links())
