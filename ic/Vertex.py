@@ -199,6 +199,8 @@ class Vertex(object):
     def highest_degree_adjacent(self,  included: list[Vertex] = [], same_link=False) -> Vertex:
         """return the adjacent vertex with the highest degree
 
+        sort by degree and over edges and return the most eligible one
+
         Parameters
         ----------
         included: list[Vertex]
@@ -216,7 +218,11 @@ class Vertex(object):
             def s(adj): return len(self.intersection(adj)) > 0
         else:
             def s(adj): return True
-        return max(self._adjacents, key=lambda a: a.degree() if a in included and s(a) else 0)
+        sorted_list = sorted((a for a in included if s(a)),
+                             key=lambda a: (a.degree(), a.over_edges()),
+                             reverse=True
+                             )
+        return sorted_list[0]
 
     def is_other_path_available(self, vertex: Vertex) -> bool:
         """check if the self vertex have a path back to the destination vertex
@@ -274,3 +280,7 @@ class Vertex(object):
     def intersection(self, vertex):
         """check if the links between two vertices are the same"""
         return set(self.links()).intersection(vertex.links())
+
+    def over_edges(self):
+        """return the over edges of the vertex"""
+        return self.degree()-len(self.links())

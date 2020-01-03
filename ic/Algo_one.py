@@ -22,6 +22,7 @@ def compute(d: int, subcomplexes: list) -> list:
     ----------
     d: int
         max delta that can have a node
+
     subcomplexes: list
         the list of subcomplexes to build the graph
 
@@ -104,18 +105,17 @@ def minimization(d: int, graph: list)-> list:
         list of vertices minimized or None if no solution is found
     """
     graph = graph.copy()
-    # reductible = True
-    # graph.sort(key=lambda v: len(v.links()), reverse=True)
-    # while reductible == True:
-    #     for vertex in graph:
-    #         reductible = False
-    #         if reduction(vertex, graph) == True:
-    #             reductible = True
-    graph.sort(key=lambda v: v.degree(), reverse=True)
-    for vertex in graph:
-        while vertex.degree() > 2:
+    graph.sort(key=lambda v: v.over_edges(), reverse=True)
+
+    i = 0
+    while i < len(graph):
+        vertex = graph[i]
+        while vertex.degree() > d:
             if not reduction(vertex, graph):
                 break
+            vertex = swap_if_possible(graph, i)
+        i += 1
+
     return graph
 
 
@@ -147,6 +147,16 @@ def reduction(v: Vertex, graph):
     return True
 
 
+def swap_if_possible(graph: list, start: int)->Vertex:
+    """simple function to sort element to retrieve the biggest one"""
+    i = start
+    while i < len(graph)-1:
+        if graph[i].over_edges() < graph[i+1].over_edges():
+            graph[i], graph[i+1] = graph[i+1], graph[i]
+        i += 1
+    return graph[start]
+
+
 def best_choice_to_remove(vertex: Vertex, graph) -> Vertex:
     """try to minimize the edges to reduce the delta
 
@@ -168,8 +178,6 @@ def best_choice_to_remove(vertex: Vertex, graph) -> Vertex:
         included=adj,
         same_link=True
     )
-    # if vertex.is_other_path_available(vertex_to_test) == False:
-    #     return None
     while not vertex.is_other_path_available(vertex_to_test):
         adj.remove(vertex_to_test)
         if len(adj) < 1:
