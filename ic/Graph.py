@@ -26,8 +26,8 @@ class Graph(object):
 
     """
 
-    def __init__(self, tag : int, is_complet:bool = False, vertices: list = [], edges : list = [], sub_graphs : list = []):
-        self._tag = tag
+    def __init__(self, name : str, is_complet:bool = False, vertices: list = [], edges : list = [], sub_graphs : list = []):
+        self._name = name
         self._vertices = []
         self._edges = []
         
@@ -36,7 +36,9 @@ class Graph(object):
                 self._add_sub_graph_(sg)
         else :
             self._is_complet = is_complet
-            self._add_all_vertices_(vertices)
+
+            if vertices :
+                self._add_all_vertices_(vertices)
 
             if is_complet :
                 for i in range (0,len(self._vertices)-1) :
@@ -46,15 +48,22 @@ class Graph(object):
                 self._edges = edges
         
 
-    def _add_edge_(self, v1 : Vertex, v2 : Vertex):
-        if not self._is_edge_exists_(v1, v2) :
+    def _add_edge_(self, v1 : Vertex, v2 : Vertex, compute_weight : bool = False):
+        if not self._has_edge_(v1, v2) :
+            self._add_vertex_(v1)
+            self._add_vertex_(v2)
             realV1 = self._get_vertex_(v1)
             realV2 = self._get_vertex_(v2)
             if realV1 and realV2 :
                 self._edges.append(Edge(realV1,realV2))
+        elif compute_weight :
+            real_edge = self._get_edge_(v1, v2)
+            if real_edge :
+                real_edge._increment_weight()
+
 
     def _add_vertex_(self, v : Vertex) :
-        if not self._is_vertex_exists_(v) :
+        if not self._has_vertex_(v) :
             self._vertices.append(Vertex(v._tag))
 
     def _add_all_vertices_(self, vertices : list) :
@@ -65,7 +74,7 @@ class Graph(object):
         for v in graph._vertices :
             self._add_vertex_(v)
         for e in graph._edges :
-            self._add_edge_(e._v1, e._v2)
+            self._add_edge_(e._v1, e._v2, True)
 
     def _get_vertex_(self, v:Vertex) -> Vertex:
         for vertex in self._vertices :
@@ -73,23 +82,39 @@ class Graph(object):
                 return vertex
         return None
 
-    def _is_edge_exists_(self, v1 : Vertex, v2 : Vertex) -> bool :
+    def _get_edge_(self, v1:Vertex, v2:Vertex) -> Edge:
+        for edge in self._edges :
+            if(edge._is_edge_of_(v1, v2)) :
+                return edge
+        return None
+    
+    def _get_edges_from_vertex(self, v : Vertex) -> list:
+        edges = []
+        for edge in self._edges :
+            if edge._has_vertex_(v) :
+                edges.append(edge)
+        return edges
+
+    def _has_edge_(self, v1 : Vertex, v2 : Vertex) -> bool :
         for edge in self._edges :
             if edge._is_edge_of_(v1, v2) :
                 return True
         return False
 
-    def _is_vertex_exists_(self, v : Vertex) -> bool :
-        for vertex in self._vertices :
-            if(vertex._tag == v._tag) :
-                return True
+    def _has_vertex_(self, v : Vertex) -> bool :
+        if not v :
+            return False
+        if self._vertices :
+            for vertex in self._vertices :
+                if vertex._tag == v._tag :
+                    return True
         return False
 
     def __hash__(self):
         return hash(id(self))
 
     def __str__(self):
-        strRes = "***Graph {}***\n".format(self._tag)
+        strRes = "***Graph {}***\n".format(self._name)
         strRes += "***Vertices : \n"
         for vertex in self._vertices :
             strRes += str(vertex)
