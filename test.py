@@ -83,24 +83,33 @@ class Test(unittest.TestCase):
 
     def test_minimization(self):
         vertices = [
-            # [8, 5, 2, 9, 7],
-            # [4, 1, 5, 6, 3],
-            # [8, 1, 10, 9, 5],
-            # [1, 10, 9, 4, 7],
-            # [4, 7, 8, 6, 3],
-
-            # [1, 8, 4],
-            # [7, 3, 2],
-            # [7, 3, 8],
-
             [1, 2, 6],
             [1, 3, 5],
             [3, 4, 5],
         ]
-        print(vertices)
         result = compute(2, vertices)
-        verify_result(2, vertices, result)
+        self.assertTrue(verify_result(2, result))
+
+        vertices = [
+            [1, 8, 4],
+            [7, 3, 2],
+            [7, 3, 8],
+        ]
+
+        result = compute(2, vertices)
+        self.assertTrue(verify_result(2, result))
+
+        vertices = [
+            [8, 5, 2, 9, 7],
+            [4, 1, 5, 6, 3],
+            [8, 1, 10, 9, 5],
+            [1, 10, 9, 4, 7],
+            [4, 7, 8, 6, 3],
+        ]
+        print(vertices)
+        result = compute(3, vertices)
         print(result)
+        # self.assertTrue(verify_result(3, result))
 
 
 if __name__ == '__main__':

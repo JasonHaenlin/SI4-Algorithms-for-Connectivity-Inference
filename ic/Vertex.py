@@ -14,10 +14,12 @@ class Vertex(object):
 
     Attributes
     ----------
-    tag : int
+    tag: int
         the tag of the vertex represented as a number
-    adjacent : list[Vertex]
+    adjacents: list[Vertex]
         list of adjacents vertices
+    links: list[int]
+        list of links that exist between multiple graph
 
     Methods
     -------
@@ -33,31 +35,35 @@ class Vertex(object):
         return the adjacents vertices in this Vertex
     correctly_connected(dest_vertex: Vertex, included: list[Vertex] = []) -> bool
         check if the self vertex have a path back to the destination vertex
+    add_link(self, link: int)
+        add a new linked graphe to the vertex
+    links(self)->list[int]
+        return the weight of the vertex
     """
 
-    def __init__(self, tag: int, adjacent: list[Vertex] = []):
+    def __init__(self, tag: int, adjacents: list[Vertex] = []):
         """
         Parameters
         ----------
         tag: int
             the tag of the vertex represented as a number
-        adjacent: list[Vertex], optional
+        adjacents: list[Vertex], optional
             list of adjacents vertices
         """
 
         self._tag = tag
         self._links = []
-        self._adjacent = []
-        self._adjacent = self._validate_vertices(adjacent)
+        self._adjacents = []
+        self._adjacents = self._validate_vertices(adjacents)
 
     def __hash__(self):
         return hash(id(self))
 
     def __str__(self):
         s = str(self._tag)
-        for v in self._adjacent:
+        for v in self._adjacents:
             s += "(" + str(v._tag) + ")"
-        if len(self._adjacent) < 1:
+        if len(self._adjacents) < 1:
             s += "()"
         return s
 
@@ -66,7 +72,7 @@ class Vertex(object):
 
     def _validate_vertices(self, vertices):
         a = {}
-        for v in self._adjacent:
+        for v in self._adjacents:
             a[v] = v
         for v in vertices:
             if v is not self:
@@ -80,7 +86,7 @@ class Vertex(object):
             marked[dest_vertex] -= 1
             return False
 
-        for a in (a for a in self._adjacent if a in included):
+        for a in (a for a in self._adjacents if a in included):
             if a not in marked:
                 if a._helper_correctly_connected(marked, dest_vertex, included) == True:
                     return True
@@ -106,8 +112,8 @@ class Vertex(object):
             self
         """
 
-        if v not in self._adjacent:
-            self._adjacent.append(v)
+        if v not in self._adjacents:
+            self._adjacents.append(v)
         return self
 
     def append_all(self, v: list[Vertex]):
@@ -124,7 +130,7 @@ class Vertex(object):
             self
         """
 
-        self._adjacent = self._validate_vertices(v)
+        self._adjacents = self._validate_vertices(v)
         return self
 
     def set_adjacents(self, v: list[Vertex]):
@@ -143,8 +149,8 @@ class Vertex(object):
             self
         """
 
-        self._adjacent = []
-        self._adjacent = self._validate_vertices(v)
+        self._adjacents = []
+        self._adjacents = self._validate_vertices(v)
         return self
 
     def remove(self, v: Vertex):
@@ -166,7 +172,7 @@ class Vertex(object):
             self
         """
 
-        self._adjacent.remove(v)
+        self._adjacents.remove(v)
         return self
 
     def degree(self, included: list[Vertex] = []) -> int:
@@ -185,8 +191,8 @@ class Vertex(object):
             count of edges
         """
         if len(included) == 0:
-            return len(self._adjacent)
-        return len([a for a in self._adjacent if a in included])
+            return len(self._adjacents)
+        return len([a for a in self._adjacents if a in included])
 
     def highest_degree_adjacent(self, included: list[Vertex] = []) -> Vertex:
         """return the adjacent vertex with the highest degree
@@ -205,7 +211,7 @@ class Vertex(object):
             def s(dests, srcs): return len(set(dests).intersection(srcs)) <= 1
         else:
             def s(dests, srcs): return True
-        return max(self._adjacent, key=lambda a: a.degree() if a in included and s(a.links(), self._links) else 0)
+        return max(self._adjacents, key=lambda a: a.degree() if a in included and s(a.links(), self._links) else 0)
 
     def get_adjacents(self) -> list:
         """return the adjacents vertices in this Vertex
@@ -215,7 +221,7 @@ class Vertex(object):
         list:
             adjacents vertices in this Vertex
         """
-        return self._adjacent
+        return self._adjacents
 
     def correctly_connected(self, dest_vertex: Vertex, included: list[Vertex] = [])->bool:
         """check if the self vertex have a path back to the destination vertex

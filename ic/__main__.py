@@ -6,7 +6,7 @@
 import argparse
 from random import sample
 from sys import argv
-from ic.Algo_one import compute
+from ic.Algo_one import compute, verify_result
 
 
 def random_instance(p: int, t: int, vmin: int = 1, vmax: int = 100) -> list:
@@ -37,27 +37,46 @@ def random_instance(p: int, t: int, vmin: int = 1, vmax: int = 100) -> list:
 
 def main():
     main_parser = argparse.ArgumentParser()
-    main_parser.add_argument("-v",
+    main_parser.add_argument("-t",
                              "--vertex",
                              help="number of vertex [1, 100]",
                              type=int,
                              default=10,
                              )
-    main_parser.add_argument("-c",
+    main_parser.add_argument("-p",
                              "--subcomplexes",
                              help="number of subcomplexes to create [1, +inf]",
                              type=int,
                              default=5,
                              )
+    main_parser.add_argument("-k",
+                             "--degree",
+                             help="the minimal degree the graph should be",
+                             type=int,
+                             default=3,
+                             )
+    main_parser.add_argument("-i",
+                             "--iteration",
+                             help="the number of iteration",
+                             type=int,
+                             default=3,
+                             )
     args = main_parser.parse_args(argv[1:])
     if args.subcomplexes < 1:
         main_parser.error('--subcomplexes should not be < 1')
+    if args.iteration < 1:
+        main_parser.error('--iteration should not be < 1')
+    if args.degree < 1:
+        main_parser.error('--degree should not be < 1')
     if args.vertex < 1 or args.vertex > 100:
         main_parser.error('--vertex should not be between 1 and 100')
 
-    inst = random_instance(args.vertex, args.subcomplexes)
-    print(inst)
-    print(compute(10, inst))
+    corrects = 0
+    for _ in range(args.iteration):
+        inst = random_instance(args.vertex, args.subcomplexes)
+        if verify_result(args.degree, compute(args.degree, inst)) == True:
+            corrects += 1
+    print(str(corrects) + "/" + str(args.iteration))
 
 
 if __name__ == "__main__":

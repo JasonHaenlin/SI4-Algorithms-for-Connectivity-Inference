@@ -195,17 +195,28 @@ def highest_removable_degree(v: Vertex, sub) -> Vertex:
     return vertex_to_test
 
 
-def verify_result(k: int, inst: list, graph: list) ->bool:
+def verify_result(k: int, graph: list) ->bool:
     """check if the builded graph is correct
 
     Parameters
     ----------
     k: int
         max degree of each vertex
-    inst: list
-        list of Vertices that represent the subcomplexes
     graph: list
         list of Vertices that represent the final graph
     """
-    print()
-    pass
+
+    if graph == None:
+        return False
+    for vertex in graph:
+        if vertex.degree() > k:
+            return False
+        origin = set(vertex.links())
+        linked_to = vertex.get_adjacents()
+        links = set()
+        for l in linked_to:
+            links = links.union(l.links())
+        if len(origin.intersection(links)) != len(origin):
+            return False
+
+    return True
