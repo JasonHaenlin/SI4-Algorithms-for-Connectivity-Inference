@@ -1,7 +1,7 @@
 import unittest
 
 from ic.Vertex import Vertex
-from ic.Algo_one import convert, is_degree_possible, reduce_degre, compute, highest_removable_degree
+from ic.Algo_one import convert, is_degree_possible, compute, highest_removable_degree, verify_result, reduction
 
 
 class Test(unittest.TestCase):
@@ -28,16 +28,16 @@ class Test(unittest.TestCase):
         res = is_degree_possible(2, [[1, 2, 3, 4], [2, 6, 7, 8], [9, 1, 4, 6]])
         self.assertTrue(res, "Should be True")
 
-    def test_reduce_degree(self):
+    def test_reduction(self):
         v1, v2, v3, v4 = Vertex(1), Vertex(2), Vertex(3), Vertex(4)
         v1.set_adjacents([v2, v3])
-        self.assertTrue(reduce_degre(
+        self.assertTrue(reduction(
             2, v1, [v2, v3]), "Should be of a good degree")
         self.assertEqual(v1.degree(), 2, "Should not have been reduced")
-        self.assertTrue(reduce_degre(3, v1, [v2, v3]),
+        self.assertTrue(reduction(3, v1, [v2, v3]),
                         "Should be of a bad degree and irreducible")
         v2.set_adjacents([v1, v2, v3])
-        self.assertTrue(reduce_degre(3, v1, [v2, v3]),
+        self.assertTrue(reduction(3, v1, [v2, v3]),
                         "Should be of a bad degree but reductible")
         self.assertEqual(v1.degree(), 2, "Should have been reduced")
 
@@ -83,14 +83,23 @@ class Test(unittest.TestCase):
 
     def test_minimization(self):
         vertices = [
-            [8, 5, 2, 9, 7],
-            [4, 1, 5, 6, 3],
-            [8, 1, 10, 9, 5],
-            [1, 10, 9, 4, 7],
-            [4, 7, 8, 6, 3],
+            # [8, 5, 2, 9, 7],
+            # [4, 1, 5, 6, 3],
+            # [8, 1, 10, 9, 5],
+            # [1, 10, 9, 4, 7],
+            # [4, 7, 8, 6, 3],
+
+            # [1, 8, 4],
+            # [7, 3, 2],
+            # [7, 3, 8],
+
+            [1, 2, 6],
+            [1, 3, 5],
+            [3, 4, 5],
         ]
         print(vertices)
-        result = compute(3, vertices)
+        result = compute(2, vertices)
+        verify_result(2, vertices, result)
         print(result)
 
 

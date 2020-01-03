@@ -46,6 +46,7 @@ class Vertex(object):
         """
 
         self._tag = tag
+        self._links = []
         self._adjacent = []
         self._adjacent = self._validate_vertices(adjacent)
 
@@ -76,6 +77,7 @@ class Vertex(object):
         marked[self] = 1
         marked[dest_vertex] += 1
         if self.degree(included + [dest_vertex]) < 2:
+            marked[dest_vertex] -= 1
             return False
 
         for a in (a for a in self._adjacent if a in included):
@@ -85,6 +87,7 @@ class Vertex(object):
             elif a is dest_vertex and marked[dest_vertex] > 1:
                 return True
 
+        marked[dest_vertex] -= 1
         return False
 
     def append(self, v: Vertex):
@@ -139,6 +142,7 @@ class Vertex(object):
         Vertex:
             self
         """
+
         self._adjacent = []
         self._adjacent = self._validate_vertices(v)
         return self
@@ -197,7 +201,11 @@ class Vertex(object):
         Vertex:
             highest degree vertex from the included vertices
         """
-        return max(self._adjacent, key=lambda a: a.degree() if a in included else 0)
+        if len(self._links) > 1:
+            def s(dests, srcs): return len(set(dests).intersection(srcs)) <= 1
+        else:
+            def s(dests, srcs): return True
+        return max(self._adjacent, key=lambda a: a.degree() if a in included and s(a.links(), self._links) else 0)
 
     def get_adjacents(self) -> list:
         """return the adjacents vertices in this Vertex
@@ -229,3 +237,19 @@ class Vertex(object):
         marked = {}
         marked[dest_vertex] = 0
         return self._helper_correctly_connected(marked, dest_vertex, to_check)
+
+    def add_link(self, link: int):
+        """add a new link
+
+        Returns
+        -------
+        Vertex:
+            self
+        """
+
+        self._links.append(link)
+        return self
+
+    def links(self)->list[int]:
+        """return the weight of the vertex"""
+        return self._links

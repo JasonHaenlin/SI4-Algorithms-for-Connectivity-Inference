@@ -45,13 +45,17 @@ def convert(subcomplexes: list) -> list:
     """
     sets = []
     flyweight = {}
+    link_count = 1
     for sub in subcomplexes:
         vs = []
         for v in sub:
             if flyweight.get(v, None) == None:
-                flyweight[v] = Vertex(v)
+                flyweight[v] = Vertex(v).add_link(link_count)
+            else:
+                flyweight[v].add_link(link_count)
             vs.append(flyweight[v])
         sets.append([v.append_all(vs) for v in vs])
+        link_count += 1
     return sets
 
 
@@ -93,16 +97,19 @@ def minimization(k: int, subcomplexes: list) -> list:
         list of vertices minimized or None if no solution is found
     """
 
-    vertices = subcomplexes
-    for sub in vertices:
-        for v in sub:
+    vertices = subcomplexes.copy()
+
+    cpt = 0
+    while cpt < len(vertices):
+        for v in vertices[cpt]:
             while v.degree() > k:
-                if reduce_degre(k, v, sub) == False:
+                if reduction(k, v, vertices[cpt]) == False:
                     break
+        cpt += 1
     return vertices
 
 
-def reduce_degre(k: int, v: Vertex, sub) -> bool:
+def reduction(k: int, v: Vertex, sub) -> bool:
     """reduce the vertex edges to fit the degree
 
     Parameters
@@ -124,7 +131,6 @@ def reduce_degre(k: int, v: Vertex, sub) -> bool:
     """
     if v.degree() <= k:
         return True
-    # highest = v.highest_degree_adjacent(sub)
     highest = highest_removable_degree(v, sub)
     if highest == None:
         return False
@@ -179,7 +185,7 @@ def highest_removable_degree(v: Vertex, sub) -> Vertex:
     vertex_to_test = v.highest_degree_adjacent(included)
     if vertex_to_test not in included:
         return None
-    while not vertex_to_test.correctly_connected(v, included):
+    while vertex_to_test.correctly_connected(v, included) == False:
         included.remove(vertex_to_test)
         if len(included) < 1:
             return None
@@ -201,5 +207,5 @@ def verify_result(k: int, inst: list, graph: list) ->bool:
     graph: list
         list of Vertices that represent the final graph
     """
-
+    print()
     pass

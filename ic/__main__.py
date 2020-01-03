@@ -6,6 +6,7 @@
 import argparse
 from random import sample
 from sys import argv
+from ic.Algo_one import compute
 
 
 def random_instance(p: int, t: int, vmin: int = 1, vmax: int = 100) -> list:
@@ -33,6 +34,7 @@ def random_instance(p: int, t: int, vmin: int = 1, vmax: int = 100) -> list:
     """
     return [sample(range(vmin, vmax+1), p) for _ in range(t)]
 
+
 def main():
     main_parser = argparse.ArgumentParser()
     main_parser.add_argument("-v",
@@ -54,8 +56,8 @@ def main():
         main_parser.error('--vertex should not be between 1 and 100')
 
     inst = random_instance(args.vertex, args.subcomplexes)
-
     print(inst)
+    print(compute(10, inst))
 
 
 if __name__ == "__main__":
