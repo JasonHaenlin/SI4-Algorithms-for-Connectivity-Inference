@@ -8,12 +8,12 @@ from collections import Counter
 from operator import itemgetter
 
 
-def compute(k: int, subcomplexes: list) -> list:
+def compute(d: int, subcomplexes: list) -> list:
     """return a new created graph
 
     Parameters
     ----------
-    k: int
+    d: int
         max delta that can have a node
     subcomplexes: list
         the list of subcomplexes to build the graph
@@ -24,11 +24,14 @@ def compute(k: int, subcomplexes: list) -> list:
         a new graph or None if it is not possible
     """
 
-    if not is_degree_possible(k, subcomplexes):
+    if not is_degree_possible(d, subcomplexes):
         return None
     subcomplexes = convert(subcomplexes)
-    graph = minimization(k, subcomplexes)
-    return unify(graph)
+    graph = unify(subcomplexes)
+    mini_graph = minimization_graph(d, graph)
+    # mini_graph = minimization_graph(d, mini_graph)
+    # graph = minimization(d, subcomplexes)
+    return graph
 
 
 def convert(subcomplexes: list) -> list:
@@ -59,12 +62,12 @@ def convert(subcomplexes: list) -> list:
     return sets
 
 
-def is_degree_possible(k: int, subcomplexes: list) -> bool:
+def is_degree_possible(d: int, subcomplexes: list) -> bool:
     """return the condition result
 
     Parameters
     ----------
-    k: int
+    d: int
         the maximal degree the vertices can have
 
     subcomplexes: list
@@ -77,15 +80,49 @@ def is_degree_possible(k: int, subcomplexes: list) -> bool:
     """
     whole = []
     [whole.extend(s) for s in subcomplexes]
-    return max(Counter(whole).items(), key=itemgetter(1))[1] <= k
+    return max(Counter(whole).items(), key=itemgetter(1))[1] <= d
 
 
-def minimization(k: int, subcomplexes: list) -> list:
-    """try to minimize the edges to reduce the delta to at least 'k'
+def minimization_graph(d: int, graph: list)-> list:
+    """just a test right now"""
+    graph = graph.copy()
+    reductible = True
+    while reductible == True:
+        for vertex in graph:
+            reductible = False
+            if try_to_reduct(vertex, graph) == True:
+                reductible = True
+    return graph
+
+
+def try_to_reduct(v: Vertex, graph):
+    highest = best_choice_to_remove(v, graph)
+    if highest == None:
+        return False
+    if highest.degree() < 2:
+        return False
+    v.remove(highest)
+    highest.remove(v)
+    return True
+
+
+def best_choice_to_remove(vertex: Vertex, graph) -> Vertex:
+    adj = vertex.get_adjacents()
+    vertex_to_test = vertex.highest_degree_adjacent(
+        included=adj,
+        same_link=True
+    )
+    if vertex.is_other_path_available(vertex_to_test) == False:
+        return None
+    return vertex_to_test
+
+
+def minimization(d: int, subcomplexes: list) -> list:
+    """try to minimize the edges to reduce the delta to at least 'd'
 
     Parameters
     ----------
-    k: int
+    d: int
         the minimal degre to reduce to
 
     subcomplexes: list
@@ -102,19 +139,19 @@ def minimization(k: int, subcomplexes: list) -> list:
     cpt = 0
     while cpt < len(vertices):
         for v in vertices[cpt]:
-            while v.degree() > k:
-                if reduction(k, v, vertices[cpt]) == False:
+            while v.degree() > d:
+                if reduction(d, v, vertices[cpt]) == False:
                     break
         cpt += 1
     return vertices
 
 
-def reduction(k: int, v: Vertex, sub) -> bool:
+def reduction(d: int, v: Vertex, sub) -> bool:
     """reduce the vertex edges to fit the degree
 
     Parameters
     ----------
-    k: int
+    d: int
         the degree to reach after the reduction
 
     v: Vertex
@@ -129,7 +166,7 @@ def reduction(k: int, v: Vertex, sub) -> bool:
         False if the vertex could not be reduced, True otherwise
 
     """
-    if v.degree() <= k:
+    if v.degree() <= d:
         return True
     highest = highest_removable_degree(v, sub)
     if highest == None:
@@ -185,31 +222,34 @@ def highest_removable_degree(v: Vertex, sub) -> Vertex:
     vertex_to_test = v.highest_degree_adjacent(included)
     if vertex_to_test not in included:
         return None
-    while vertex_to_test.correctly_connected(v, included) == False:
+    while vertex_to_test.correctly_connected(v) == False:
         included.remove(vertex_to_test)
         if len(included) < 1:
             return None
         vertex_to_test = v.highest_degree_adjacent(included)
         if vertex_to_test not in included:
-            return None
+            return Nones
     return vertex_to_test
 
 
-def verify_result(k: int, graph: list) ->bool:
+def verify_result(d: int, k: int, graph: list) ->bool:
     """check if the builded graph is correct
 
     Parameters
     ----------
-    k: int
+    d: int
         max degree of each vertex
+    k: int
+        max edges of the graph
     graph: list
         list of Vertices that represent the final graph
     """
-
     if graph == None:
         return False
+    edges = 0
     for vertex in graph:
-        if vertex.degree() > k:
+        edges += vertex.degree()
+        if vertex.degree() > d:
             return False
         origin = set(vertex.links())
         linked_to = vertex.get_adjacents()
@@ -219,4 +259,38 @@ def verify_result(k: int, graph: list) ->bool:
         if len(origin.intersection(links)) != len(origin):
             return False
 
+    if (edges/2) > k:
+        return False
+
     return True
+
+
+def something_wrong(vo, vd):
+    vos = vo.get_adjacents()
+    vos.remove(vd)
+    vds = vd.get_adjacents()
+    vds.remove(vo)
+
+    src = set(vo.links())
+    dest = set(vd.links())
+    deep_links = src.intersection(dest)
+
+    links = set()
+    for a in vos:
+        links = links.union(a.links())
+    if len(src.intersection(links)) != len(src):
+        vos.append(vd)
+        vds.append(vo)
+        return True
+
+    links = set()
+    for a in vds:
+        links = links.union(a.links())
+    if len(dest.intersection(links)) != len(dest):
+        vos.append(vd)
+        vds.append(vo)
+        return True
+
+    vos.append(vd)
+    vds.append(vo)
+    return False

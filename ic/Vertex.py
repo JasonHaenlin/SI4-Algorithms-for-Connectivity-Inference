@@ -79,10 +79,27 @@ class Vertex(object):
                 a[v] = v
         return [v for v in a.values()]
 
+    def _is_there_a_path(self, vertex: Vertex, marked: dict, l: set) -> bool:
+        marked[vertex] = 1
+        marked[self] += 1
+        if vertex.degree() < 2:
+            marked[self] -= 1
+            return False
+
+        for adj in (adj for adj in vertex.get_adjacents() if l in adj.links()):
+            if adj not in marked:
+                if self._is_there_a_path(adj, marked, l) == True:
+                    return True
+            elif adj is self and marked[self] > 1:
+                return True
+
+        marked[self] -= 1
+        return False
+
     def _helper_correctly_connected(self, marked: dict, dest_vertex: Vertex, included: list[Vertex] = []) -> bool:
         marked[self] = 1
         marked[dest_vertex] += 1
-        if self.degree(included + [dest_vertex]) < 2:
+        if self.degree(included) < 2:
             marked[dest_vertex] -= 1
             return False
 
@@ -90,7 +107,7 @@ class Vertex(object):
             if a not in marked:
                 if a._helper_correctly_connected(marked, dest_vertex, included) == True:
                     return True
-            elif a is dest_vertex and marked[dest_vertex] > 1:
+            elif a is dest_vertex and marked[dest_vertex] > 2:
                 return True
 
         marked[dest_vertex] -= 1
@@ -194,7 +211,7 @@ class Vertex(object):
             return len(self._adjacents)
         return len([a for a in self._adjacents if a in included])
 
-    def highest_degree_adjacent(self, included: list[Vertex] = []) -> Vertex:
+    def highest_degree_adjacent(self,  included: list[Vertex] = [], same_link=False) -> Vertex:
         """return the adjacent vertex with the highest degree
 
         Parameters
@@ -202,16 +219,27 @@ class Vertex(object):
         included: list[Vertex]
             the vertices to include in the research (the other are excluded)
 
+        same_link: bool
+            check if the adjcent vertex need to have the same links (default=False)
         Returns
         -------
         Vertex:
             highest degree vertex from the included vertices
         """
-        if len(self._links) > 1:
-            def s(dests, srcs): return len(set(dests).intersection(srcs)) <= 1
+        if same_link == True:
+            def s(adj): return len(self.intersection(adj)) > 0
         else:
-            def s(dests, srcs): return True
-        return max(self._adjacents, key=lambda a: a.degree() if a in included and s(a.links(), self._links) else 0)
+            def s(adj): return True
+        return max(self._adjacents, key=lambda a: a.degree() if a in included and s(a) else 0)
+
+    def is_other_path_available(self, vertex: Vertex) -> bool:
+        links = self.intersection(vertex)
+        for l in links:
+            marked = {}
+            marked[self] = 0
+            if self._is_there_a_path(vertex, marked, l) == False:
+                return False
+        return True
 
     def get_adjacents(self) -> list:
         """return the adjacents vertices in this Vertex
@@ -221,7 +249,7 @@ class Vertex(object):
         list:
             adjacents vertices in this Vertex
         """
-        return self._adjacents
+        return self._adjacents.copy()
 
     def correctly_connected(self, dest_vertex: Vertex, included: list[Vertex] = [])->bool:
         """check if the self vertex have a path back to the destination vertex
@@ -259,3 +287,11 @@ class Vertex(object):
     def links(self)->list[int]:
         """return the weight of the vertex"""
         return self._links
+
+    def intersection(self, vertex):
+        """check if the links between two vertices are the same"""
+        return set(self.links()).intersection(vertex.links())
+
+    def include(self, vertex):
+        """check if vertex is include in self"""
+        return set(self.links()).issuperset(vertex.links())
