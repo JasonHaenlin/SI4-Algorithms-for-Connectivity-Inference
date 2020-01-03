@@ -6,10 +6,17 @@
 from ic.Vertex import Vertex
 from collections import Counter
 from operator import itemgetter
+from random import shuffle
 
 
 def compute(d: int, subcomplexes: list) -> list:
     """return a new created graph
+
+    the function is checking if the degree can be reach,
+    otherwise it returns None.
+    It convert the 2D list into list of vertices and unify it
+    to build a unique graph which include all the subcomplexes.
+    return a minimized graph
 
     Parameters
     ----------
@@ -28,8 +35,7 @@ def compute(d: int, subcomplexes: list) -> list:
         return None
     subcomplexes = convert(subcomplexes)
     graph = unify(subcomplexes)
-    mini_graph = minimization(d, graph)
-    return mini_graph
+    return minimization(d, graph)
 
 
 def convert(subcomplexes: list) -> list:
@@ -50,7 +56,7 @@ def convert(subcomplexes: list) -> list:
     for sub in subcomplexes:
         vs = []
         for v in sub:
-            if flyweight.get(v, None) == None:
+            if not flyweight.get(v, None):
                 flyweight[v] = Vertex(v).add_link(link_count)
             else:
                 flyweight[v].add_link(link_count)
@@ -98,16 +104,22 @@ def minimization(d: int, graph: list)-> list:
         list of vertices minimized or None if no solution is found
     """
     graph = graph.copy()
-    reductible = True
-    while reductible == True:
-        for vertex in graph:
-            reductible = False
-            if try_to_reduct(vertex, graph) == True:
-                reductible = True
+    # reductible = True
+    # graph.sort(key=lambda v: len(v.links()), reverse=True)
+    # while reductible == True:
+    #     for vertex in graph:
+    #         reductible = False
+    #         if reduction(vertex, graph) == True:
+    #             reductible = True
+    graph.sort(key=lambda v: v.degree(), reverse=True)
+    for vertex in graph:
+        while vertex.degree() > 2:
+            if not reduction(vertex, graph):
+                break
     return graph
 
 
-def try_to_reduct(v: Vertex, graph):
+def reduction(v: Vertex, graph):
     """reduce the vertex edges to fit the degree
 
     Parameters
@@ -126,7 +138,7 @@ def try_to_reduct(v: Vertex, graph):
 
     """
     highest = best_choice_to_remove(v, graph)
-    if highest == None:
+    if not highest:
         return False
     if highest.degree() < 2:
         return False
@@ -156,8 +168,16 @@ def best_choice_to_remove(vertex: Vertex, graph) -> Vertex:
         included=adj,
         same_link=True
     )
-    if vertex.is_other_path_available(vertex_to_test) == False:
-        return None
+    # if vertex.is_other_path_available(vertex_to_test) == False:
+    #     return None
+    while not vertex.is_other_path_available(vertex_to_test):
+        adj.remove(vertex_to_test)
+        if len(adj) < 1:
+            return None
+        vertex_to_test = vertex.highest_degree_adjacent(
+            included=adj,
+            same_link=True
+        )
     return vertex_to_test
 
 
@@ -174,7 +194,7 @@ def unify(subcomplexes: list) -> list:
     list:
         the new graph
     """
-    if subcomplexes == None:
+    if not subcomplexes:
         return None
     graph = {}
     for sub in subcomplexes:
@@ -195,7 +215,7 @@ def verify_result(d: int, k: int, graph: list) ->bool:
     graph: list
         list of Vertices that represent the final graph
     """
-    if graph == None:
+    if not graph:
         return False
     edges = 0
     for vertex in graph:
@@ -217,7 +237,12 @@ def verify_result(d: int, k: int, graph: list) ->bool:
 
 
 def something_wrong(vo, vd):
-    """testing function to check if a separation between two nodes is fine"""
+    """testing function to check if a separation between two nodes is fine
+
+    Testing purpose only
+
+    """
+
     vos = vo.get_adjacents()
     vos.remove(vd)
     vds = vd.get_adjacents()

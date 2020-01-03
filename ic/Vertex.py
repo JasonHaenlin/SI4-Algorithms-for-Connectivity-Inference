@@ -33,7 +33,7 @@ class Vertex(object):
         return the adjacent vertex with the highest degree
     get_adjacents() -> list[Vertex]
         return the adjacents vertices in this Vertex
-    correctly_connected(dest_vertex: Vertex, included: list[Vertex] = []) -> bool
+    is_other_path_available(self, vertex: Vertex) -> bool
         check if the self vertex have a path back to the destination vertex
     add_link(self, link: int)
         add a new linked graphe to the vertex
@@ -71,6 +71,7 @@ class Vertex(object):
         return str(self)
 
     def _validate_vertices(self, vertices):
+        """avoid duplication adjacents vertices"""
         a = {}
         for v in self._adjacents:
             a[v] = v
@@ -80,6 +81,7 @@ class Vertex(object):
         return [v for v in a.values()]
 
     def _is_there_a_path(self, vertex: Vertex, marked: dict, l: set) -> bool:
+        """check for the current link, if a path back exist"""
         marked[vertex] = 1
         marked[self] += 1
         if vertex.degree() < 2:
@@ -88,7 +90,7 @@ class Vertex(object):
 
         for adj in (adj for adj in vertex.get_adjacents() if l in adj.links()):
             if adj not in marked:
-                if self._is_there_a_path(adj, marked, l) == True:
+                if self._is_there_a_path(adj, marked, l):
                     return True
             elif adj is self and marked[self] > 1:
                 return True
@@ -204,12 +206,13 @@ class Vertex(object):
 
         same_link: bool
             check if the adjcent vertex need to have the same links (default=False)
+
         Returns
         -------
         Vertex:
             highest degree vertex from the included vertices
         """
-        if same_link == True:
+        if same_link:
             def s(adj): return len(self.intersection(adj)) > 0
         else:
             def s(adj): return True
@@ -217,6 +220,12 @@ class Vertex(object):
 
     def is_other_path_available(self, vertex: Vertex) -> bool:
         """check if the self vertex have a path back to the destination vertex
+
+        It's checking if a path exist for each link on the current node
+
+        example: if if the intersection links between self and vertex are the subcomplexe 1 and 2,
+        so we need to check if an other way can reach the self node, and for each links in case they
+        do not have the same path
 
         Parameters
         ----------
@@ -232,7 +241,7 @@ class Vertex(object):
         for l in links:
             marked = {}
             marked[self] = 0
-            if self._is_there_a_path(vertex, marked, l) == False:
+            if not self._is_there_a_path(vertex, marked, l):
                 return False
         return True
 
