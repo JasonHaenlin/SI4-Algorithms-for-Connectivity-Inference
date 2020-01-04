@@ -27,6 +27,7 @@ class Graph(object):
     """
 
     def __init__(self, name : str, is_complet:bool = False, vertices: list = [], edges : list = [], sub_graphs : list = []):
+        #print("creating {}".format(name))
         self._name = name
         self._vertices = []
         self._edges = []
@@ -44,7 +45,9 @@ class Graph(object):
             if is_complet :
                 for i in range (0,len(self._vertices)-1) :
                     for j in range (i+1, len(self._vertices)):
+                        #print("add edge {} {}".format(self._vertices[i], self._vertices[j]))
                         self._add_edge_(v1=self._vertices[i], v2=self._vertices[j])
+                        #print ("{}\n{}".format(self._vertices[i], self._vertices[j]))
             else :
                 self._edges = edges
         
@@ -86,6 +89,18 @@ class Graph(object):
             self._add_vertex_(v, compute_weight=True)
         for e in graph._edges :
             self._add_edge_(e=e, compute_weight=True)
+
+    def delete_edge(self, e : Edge) :
+        if not e :
+            return
+
+        real_edge = self._get_edge_(e._v1, e._v2)
+        if not real_edge : 
+            return
+
+        real_edge._v1.remove(real_edge._v2)
+        real_edge._v2.remove(real_edge._v1)
+        self._edges.remove(real_edge)
 
     def _update_sub_graphs_weights_(self, sub_graphs : list) :
         for sg in sub_graphs :
@@ -133,6 +148,70 @@ class Graph(object):
             for vertex in self._vertices :
                 if vertex._tag == v._tag :
                     return True
+        return False
+
+    def is_useful_edge(self, e : Edge, sg : 'Graph') -> bool :
+        if not e :
+            return False
+        if not self._has_edge_(e._v1, e._v2) :
+            return False
+        if not sg._has_edge_(e._v1, e._v2) :
+            return False
+        if not self._exists_indirect_way_(e._v1, e._v2, sg) :
+            return True
+        return False
+    
+    def _exists_indirect_way_(self, v1 : Vertex, v2 : Vertex, sg : 'Graph') -> bool:
+        if not v1 or not v2 :
+            return False
+
+        adjacents = v1._adjacents
+        if len(adjacents) == 1 or len(v2._adjacents) == 1 : 
+            return False
+        
+        if adjacents and len(adjacents) > 1 :
+            forbidden_vertices = []
+            forbidden_vertices.append(v1)
+            for adj in adjacents : 
+                if(adj._tag != v2._tag) and sg._has_vertex_(adj) : 
+                    exist_way = self._exists_way_(forbidden_vertices, adj, v2, sg)
+                    if exist_way :
+                        return True
+        return False
+        
+
+    def _exists_way_(self, forbidden_vertices : list, v1:Vertex, v2:Vertex, sg : 'Graph') -> bool :
+        if not v1 or not v2 :
+            return False
+
+        adjacents = v1._adjacents
+        adjacents_to_check = []
+
+        if adjacents :
+            for adj in adjacents :
+                if adj._tag == v2._tag :
+                    return True
+                if not self._is_forbidden_vertex_(forbidden_vertices, adj) and sg._has_vertex_(adj) :
+                    adjacents_to_check.append(adj)
+
+        if len(adjacents_to_check) == 0 :
+            return False
+        
+        forbidden_vertices.append(v1)
+        for a in adjacents_to_check :
+            exist_way = self._exists_way_(forbidden_vertices, a, v2, sg)
+            if exist_way :
+                return True
+        return False
+
+    def _is_forbidden_vertex_(self, forbidden_vertices : list, v1:Vertex) -> bool :
+        if not forbidden_vertices :
+            return False
+        if not v1 : 
+            return False
+        for v in forbidden_vertices :
+            if v1._tag == v._tag :
+                return True
         return False
 
     def _reset_(self) :

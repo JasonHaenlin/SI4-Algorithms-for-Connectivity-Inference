@@ -16,8 +16,8 @@ class Edge(object):
             else :
                 self._v1 = v2
                 self._v2 = v1
-            self._v1.append(v2)
-            self._v2.append(v1)
+            self._v1.append(self._v2)
+            self._v2.append(self._v1)
 
     def _is_edge_of_(self, v1 : Vertex, v2 : Vertex) -> bool:
         if v1._tag == self._v1._tag and v2._tag == self._v2._tag:

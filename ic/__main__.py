@@ -7,6 +7,8 @@ import argparse
 from random import sample
 from sys import argv
 from ic.Algo_one import compute, verify_result
+from ic.Algo_two import compute as compute_2
+from ic.Algo_two import verify_result as verify_result_2
 
 
 def random_instance(p: int, t: int, vmin: int = 1, vmax: int = 100) -> list:
@@ -37,6 +39,12 @@ def random_instance(p: int, t: int, vmin: int = 1, vmax: int = 100) -> list:
 
 def main():
     main_parser = argparse.ArgumentParser()
+    main_parser.add_argument("-a",
+                             "--algo",
+                             help="type of algo to use (1 or 2)",
+                             type=int,
+                             default=1,
+                             )
     main_parser.add_argument("-p",
                              "--vertex",
                              help="number of vertex [1, 100]",
@@ -70,6 +78,8 @@ def main():
     args = main_parser.parse_args(argv[1:])
     if args.subcomplexes < 1:
         main_parser.error('--subcomplexes should not be < 1')
+    if args.algo != 1 and args.algo != 2:
+        main_parser.error('--algo should be 1 or 2')
     if args.iteration < 1:
         main_parser.error('--iteration should not be < 1')
     if args.degree < 1:
@@ -79,13 +89,18 @@ def main():
     if args.vertex < 1 or args.vertex > 100:
         main_parser.error('--vertex should not be between 1 and 100')
 
+    print("algo : {}".format(args.algo))
     print("p :" + str(args.vertex) + "\tt :" + str(args.subcomplexes))
     corrects = 0
     for _ in range(args.iteration):
-        inst = random_instance(args.vertex, args.subcomplexes)
+        inst = random_instance(args.vertex, args.subcomplexes, 1, 100)
         # print(inst)
-        if verify_result(args.degree, args.maxedges, compute(args.degree, inst)) == True:
-            corrects += 1
+        if args.algo == 1 :
+            if verify_result(args.degree, args.maxedges, compute(args.degree, inst)) == True:
+                corrects += 1
+        else :
+            if verify_result_2(args.degree, args.maxedges, compute_2(args.maxedges, args.degree, inst)) == True:
+                corrects += 1
     print(str(corrects) + "/" + str(args.iteration))
 
 

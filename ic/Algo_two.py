@@ -11,38 +11,68 @@ from operator import itemgetter
 
 import time
 
-def compute(k: int, delta : int, sg: list) -> list:
-    init(k, delta, sg)
-    tree1 = get_tree(sub_graphs[0])
-    result._add_sub_graph_(tree1)
-    calculate_delta()
-    tree2 = get_tree(sub_graphs[1])
-    result._add_sub_graph_(tree2)
-    calculate_delta()
-    tree3 = get_tree(sub_graphs[2])
-    result._add_sub_graph_(tree3)
-    calculate_delta()
-    tree4 = get_tree(sub_graphs[3])
-    result._add_sub_graph_(tree4)
-    calculate_delta()
-    tree5 = get_tree(sub_graphs[4])
-    result._add_sub_graph_(tree5)
-    calculate_delta()
-    print(result)
+def compute(k: int, delta : int, sg: list, real_list : list = []) -> Graph:
+    #print("compute algo 2")
+    init(k, delta, sg, real_list)
+    if sub_graphs :
+        global trees
+        for sub in sub_graphs :
+            #print(sub)
+            tree = get_tree(sub)
+            trees.append(tree)
+            #print(tree)
+            result._add_sub_graph_(tree)
+            calculate_delta()
+    #print(result)
+    delete_unuseful_edges()
+    #print("edges deleted")
+    #print(result)
+    return result
 
-def init(k: int, delta : int, sg: list) :
+def init(k: int, delta : int, sg: list, real_list : list = []) :
     global sub_graphs
     global big_graph
     global result
     global actual_delta
     global vertices_with_delta_max
+    global trees
+    trees = []
     actual_delta = 0
     vertices_with_delta_max = []
-    sub_graphs = sg
+    sub_graphs = []
+    if real_list :
+        sub_graphs = real_list
+        #for s in sub_graphs :
+            #print(s)
+    else :
+        i = 1
+        if sg :
+            for g in sg :
+                list_vertices = []
+                #print("*******************\nSubgraph {}\n*******************".format(i))
+                for v in g :
+                    real_vertex = Vertex(v)
+                    #print(real_vertex)
+                    list_vertices.append(real_vertex)
+                real_graph = Graph("Subgraph", True, vertices=list_vertices)
+                sub_graphs.append(real_graph)
+                i += 1
     big_graph = get_all_sub_graphs_in_one()
     result = Graph("Result")
     result._reset_()
-    print(str(big_graph))
+    #print(str(big_graph))
+
+def verify_result(d: int, k: int, graph: Graph) ->bool:
+    if not graph:
+        return False
+    if not graph._vertices:
+        return False
+    if len(graph._edges) > k :
+        return False
+    for v in graph._vertices :
+        if v.degree() > d :
+            return False
+    return True
 
 def get_all_sub_graphs_in_one() -> Graph:
     return Graph("Global", sub_graphs=sub_graphs)
@@ -71,7 +101,7 @@ def is_vertex_with_max_delta(v: Vertex) -> bool :
     return False
 
 def get_tree(graph : Graph) -> Graph :
-    print("actual delta : {} / vertices {}".format(actual_delta, vertices_with_delta_max))
+    #print("actual delta : {} / vertices {}".format(actual_delta, vertices_with_delta_max))
     tree = Graph("Tree")
     tree._reset_()
     edge = get_first_best_edge(graph._edges)
@@ -212,3 +242,20 @@ def get_edge_with_max_weight(edges : list, tree : Graph, source : Vertex) -> Edg
                     #print("choose !")
             i += 1
     return edge
+
+def delete_unuseful_edges() :
+    if result and result._edges :
+        for edge in result._edges :
+            if not is_useful_edge(edge) :
+                result.delete_edge(edge)
+
+def is_useful_edge(e : Edge) -> bool :
+    if not e : 
+        return False
+
+    if sub_graphs :
+        for sg in sub_graphs :
+            useful = result.is_useful_edge(e, sg)
+            if useful :
+                return True
+    return False

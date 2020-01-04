@@ -15,13 +15,15 @@ class Test2(unittest.TestCase):
         v6 = Vertex(6)
         v7 = Vertex(7)
         v8 = Vertex(8)
-        g1 = Graph(1, True, [v1, v2, v3])
-        g2 = Graph(2, True, [v2, v4, v5])
-        g3 = Graph(3, True, [v3, v4, v5])
-        g4 = Graph(4, True, [v4, v5, v6, v7])
-        g5 = Graph(5, True, [v6, v8])
-
-        compute(k=0, delta=3, sg=[g1,g2,g3,g4, g5])
+        v9 = Vertex(9)
+        v10 = Vertex(10)
+        g1 = Graph(1, True, [v4, v7, v6, v9, v1])
+        g2 = Graph(2, True, [v1, v5, v10, v7, v9])
+        g3 = Graph(3, True, [v3, v9, v4, v5, v7])
+        #g4 = Graph(4, True, [v4, v5, v6, v7])
+        #g5 = Graph(5, True, [v6, v8])
+        #print(g1)
+        compute(k=0, delta=3, sg=[], real_list=[g1,g2,g3])
 
 if __name__ == '__main__':
     unittest.main()
