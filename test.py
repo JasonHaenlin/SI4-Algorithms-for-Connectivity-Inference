@@ -17,12 +17,13 @@ class Test(unittest.TestCase):
         v4 = Vertex(4, [v1, v2, v3])
         v1.set_adjacents([v1, v2, v3, v4])
 
-        self.assertEqual(v3.highest_degree_adjacent(), v1, "Should be v1")
+        self.assertEqual(v3.highest_degree_adjacent(
+            [v1, v2]), v1, "Should be v1")
 
     def test_convert(self):
         vertices = convert([[1, 2, 3, 4], [2, 6, 7, 8]])
         self.assertTrue(str(vertices[0][1]) ==
-                        "2(1)(3)(4)(6)(7)(8)", "Should be True")
+                        "2(1)(3)(4)(6)(7)(8) : w(1)", "Should be True")
 
     def test_is_degree_possible(self):
         res = is_degree_possible(2, [[1, 2, 3, 4], [2, 6, 7, 8], [9, 1, 4, 6]])
@@ -41,7 +42,7 @@ class Test(unittest.TestCase):
             [1, 3, 5],
             [3, 4, 5],
         ]
-        result = compute(2, vertices)
+        result = compute(100, 2, vertices)
 
         vertices = [
             [1, 8, 4],
@@ -49,7 +50,7 @@ class Test(unittest.TestCase):
             [7, 3, 8],
         ]
 
-        result = compute(2, vertices)
+        result = compute(100, 2, vertices)
 
         vertices = [
             [8, 5, 2, 9, 7],
@@ -58,7 +59,7 @@ class Test(unittest.TestCase):
             [1, 10, 9, 4, 7],
             [4, 7, 8, 6, 3],
         ]
-        result = compute(5, vertices)
+        result = compute(100, 5, vertices)
 
         vertices = [
             [12, 51, 58, 73, 39, 52, 57, 11, 4, 22, 28, 85, 44, 24, 9],
@@ -83,8 +84,8 @@ class Test(unittest.TestCase):
             [96, 27, 55, 42, 88, 33, 100, 37, 26, 45, 95, 53, 18, 65, 51]
         ]
         print(vertices)
-        result = compute(10, vertices)
-        print(verify_result(10, 10000, result))
+        result = compute(1000, 10, vertices)
+        print(verify_result(10, 1000, result))
 
 
 if __name__ == '__main__':

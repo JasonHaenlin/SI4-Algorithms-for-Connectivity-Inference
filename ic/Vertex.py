@@ -65,7 +65,7 @@ class Vertex(object):
             s += "(" + str(v._tag) + ")"
         if len(self._adjacents) < 1:
             s += "()"
-        s += " : weight({})".format(self._weight)
+        s += " : w({})".format(self._weight)
         return s
 
     def __repr__(self):
@@ -81,7 +81,7 @@ class Vertex(object):
                 a[v] = v
         return [v for v in a.values()]
 
-    def _increment_weight(self) :
+    def _increment_weight(self):
         self._weight += 1
 
     def _is_there_a_path(self, vertex: Vertex, marked: dict, l: set) -> bool:
@@ -226,7 +226,7 @@ class Vertex(object):
                              key=lambda a: (a.degree(), a.over_edges()),
                              reverse=True
                              )
-        return sorted_list[0]
+        return sorted_list[0] if len(sorted_list) > 0 else None
 
     def is_other_path_available(self, vertex: Vertex) -> bool:
         """check if the self vertex have a path back to the destination vertex
@@ -283,6 +283,8 @@ class Vertex(object):
 
     def intersection(self, vertex):
         """check if the links between two vertices are the same"""
+        if not vertex:
+            return set()
         return set(self.links()).intersection(vertex.links())
 
     def over_edges(self):

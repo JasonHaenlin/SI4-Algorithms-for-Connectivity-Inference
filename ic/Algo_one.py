@@ -9,7 +9,7 @@ from operator import itemgetter
 from random import shuffle
 
 
-def compute(d: int, subcomplexes: list) -> list:
+def compute(k: int, d: int, subcomplexes: list) -> list:
     """return a new created graph
 
     the function is checking if the degree can be reach,
@@ -20,6 +20,8 @@ def compute(d: int, subcomplexes: list) -> list:
 
     Parameters
     ----------
+    k: int
+        max edges that the graph should have
     d: int
         max delta that can have a node
 
@@ -29,14 +31,14 @@ def compute(d: int, subcomplexes: list) -> list:
     Returns
     -------
     list:
-        a new graph or None if it is not possible
+        a new graph as a list of Vertex or None if it is not possible
     """
 
     if not is_degree_possible(d, subcomplexes):
         return None
     subcomplexes = convert(subcomplexes)
     graph = unify(subcomplexes)
-    return minimization(d, graph)
+    return minimization(k, d, graph)
 
 
 def convert(subcomplexes: list) -> list:
@@ -88,11 +90,14 @@ def is_degree_possible(d: int, subcomplexes: list) -> bool:
     return max(Counter(whole).items(), key=itemgetter(1))[1] <= d
 
 
-def minimization(d: int, graph: list)-> list:
+def minimization(k: int, d: int, graph: list)-> list:
     """try to minimize the edges to reduce the delta to at least 'd'
 
     Parameters
     ----------
+    k: int
+        the minimal edges to reduce to
+
     d: int
         the minimal degre to reduce to
 
@@ -106,13 +111,15 @@ def minimization(d: int, graph: list)-> list:
     """
     graph = graph.copy()
     graph.sort(key=lambda v: v.over_edges(), reverse=True)
-
+    edges = sum(v.degree() for v in graph)/2
     i = 0
     while i < len(graph):
         vertex = graph[i]
-        while vertex.degree() > d:
+        while vertex.degree() > d or edges > k:
             if not reduction(vertex, graph):
                 break
+            else:
+                edges -= 1
             vertex = swap_if_possible(graph, i)
         i += 1
 
@@ -238,6 +245,7 @@ def verify_result(d: int, k: int, graph: list) ->bool:
         if len(origin.intersection(links)) != len(origin):
             return False
 
+    # print("edges : " + str(edges/2))
     if (edges/2) > k:
         return False
 
