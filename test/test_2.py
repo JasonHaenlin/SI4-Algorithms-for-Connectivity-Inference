@@ -2,7 +2,8 @@ import unittest
 
 from ic.Vertex import Vertex
 from ic.Graph import Graph
-from ic.Algo_two import compute
+from ic.Algo_two import compute, verify_result
+
 
 class Test2(unittest.TestCase):
 
@@ -22,8 +23,10 @@ class Test2(unittest.TestCase):
         g3 = Graph(3, True, [v3, v9, v4, v5, v7])
         #g4 = Graph(4, True, [v4, v5, v6, v7])
         #g5 = Graph(5, True, [v6, v8])
-        #print(g1)
-        compute(k=0, delta=3, sg=[], real_list=[g1,g2,g3])
+        # print(g1)
+        graph = compute(k=0, delta=3, sg=[], real_list=[g1, g2, g3])
+        print(verify_result(3, 0, graph))
+
 
 if __name__ == '__main__':
     unittest.main()

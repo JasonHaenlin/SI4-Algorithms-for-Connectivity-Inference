@@ -218,15 +218,15 @@ def unify(subcomplexes: list) -> list:
     return [v for v in graph.values()]
 
 
-def verify_result(d: int, k: int, graph: list) ->bool:
+def verify_result(k: int, d: int, graph: list) ->bool:
     """check if the builded graph is correct
 
     Parameters
     ----------
-    d: int
-        max degree of each vertex
     k: int
         max edges of the graph
+    d: int
+        max degree of each vertex
     graph: list
         list of Vertices that represent the final graph
     """

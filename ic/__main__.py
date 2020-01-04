@@ -44,8 +44,9 @@ def main():
     main_parser.add_argument("-a",
                              "--algo",
                              help="type of algo to use (1 or 2)",
+                             choices=[1, 2],
                              type=int,
-                             default=1,
+                             default=2,
                              )
     main_parser.add_argument("-p",
                              "--vertex",
@@ -96,12 +97,11 @@ def main():
     corrects = 0
     for _ in range(args.iteration):
         inst = random_instance(args.vertex, args.subcomplexes)
-        # print(inst)
         if args.algo == 1:
-            if verify_result(args.degree, args.maxedges, compute(args.degree, inst)) == True:
+            if verify_result(args.maxedges, args.degree, compute(args.maxedges, args.degree, inst)) == True:
                 corrects += 1
         else:
-            if verify_result_2(args.degree, args.maxedges, compute_2(args.maxedges, args.degree, inst)) == True:
+            if verify_result_2(args.maxedges, args.degree,  compute_2(args.maxedges, args.degree, inst)) == True:
                 corrects += 1
     print(str(corrects) + "/" + str(args.iteration))
 
