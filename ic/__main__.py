@@ -93,7 +93,7 @@ def main():
     print("p :" + str(args.vertex) + "\tt :" + str(args.subcomplexes))
     corrects = 0
     for _ in range(args.iteration):
-        inst = random_instance(args.vertex, args.subcomplexes, 1, 100)
+        inst = random_instance(args.vertex, args.subcomplexes)
         # print(inst)
         if args.algo == 1 :
             if verify_result(args.degree, args.maxedges, compute(args.degree, inst)) == True:
