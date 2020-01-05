@@ -161,9 +161,24 @@ class Graph(object):
             return True
         return False
 
+    def is_connexe(self, sg : 'Graph') -> bool :
+        if self._vertices and sg and sg._vertices and len(sg._vertices) > 0 :
+            source = sg._vertices[0]
+            #print("source : {}".format(source))
+            for v in sg._vertices :
+                if source._tag != v._tag :
+                    #print("checking for : {}".format(v))
+                    if not self._exists_way_([], source, v, sg) :
+                        return False
+            return True
+
+
     def _exists_indirect_way_(self, v1: Vertex, v2: Vertex, sg: 'Graph') -> bool:
         if not v1 or not v2:
             return False
+
+        v1 = self._get_vertex_(v1)
+        v2 = self._get_vertex_(v2)
 
         adjacents = v1._adjacents
         if len(adjacents) == 1 or len(v2._adjacents) == 1:
@@ -181,8 +196,12 @@ class Graph(object):
         return False
 
     def _exists_way_(self, forbidden_vertices: list, v1: Vertex, v2: Vertex, sg: 'Graph') -> bool:
+        #print("check {} and {}".format(v1,v2))
         if not v1 or not v2:
             return False
+
+        v1 = self._get_vertex_(v1)
+        v2 = self._get_vertex_(v2)
 
         adjacents = v1._adjacents
         adjacents_to_check = []

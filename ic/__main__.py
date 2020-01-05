@@ -36,7 +36,7 @@ def random_instance(p: int, t: int, vmin: int = 1, vmax: int = 100) -> list:
 
     """
     return randint(vmin, vmax+1, (t, p)).tolist()
-    # return [sample(range(vmin, vmax+1), p) for _ in range(t)]
+    #return [sample(range(vmin, vmax+1), p) for _ in range(t)]
 
 
 def main():

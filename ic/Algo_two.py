@@ -9,18 +9,13 @@ from ic.Graph import Graph
 from collections import Counter
 from operator import itemgetter
 
-import time
-
-
 def compute(k: int, delta: int, sg: list, real_list: list = []) -> Graph:
     #print("compute algo 2")
     init(k, delta, sg, real_list)
     if sub_graphs:
-        global trees
         for sub in sub_graphs:
             # print(sub)
             tree = get_tree(sub)
-            trees.append(tree)
             # print(tree)
             result._add_sub_graph_(tree)
             calculate_delta()
@@ -33,12 +28,9 @@ def compute(k: int, delta: int, sg: list, real_list: list = []) -> Graph:
 
 def init(k: int, delta: int, sg: list, real_list: list = []):
     global sub_graphs
-    global big_graph
     global result
     global actual_delta
     global vertices_with_delta_max
-    global trees
-    trees = []
     actual_delta = 0
     vertices_with_delta_max = []
     sub_graphs = []
@@ -54,7 +46,7 @@ def init(k: int, delta: int, sg: list, real_list: list = []):
                 #print("*******************\nSubgraph {}\n*******************".format(i))
                 for v in g:
                     real_vertex = Vertex(v)
-                    # print(real_vertex)
+                    #print(real_vertex)
                     list_vertices.append(real_vertex)
                 real_graph = Graph("Subgraph", True, vertices=list_vertices)
                 sub_graphs.append(real_graph)
@@ -75,8 +67,17 @@ def verify_result(k: int, d: int, graph: Graph) ->bool:
     for v in graph._vertices:
         if v.degree() > d:
             return False
+    if not is_all_subcomplexes_connexes() :
+        return False
     return True
 
+def is_all_subcomplexes_connexes() -> bool :
+    if sub_graphs :
+        for sg in sub_graphs :
+            if not result.is_connexe(sg) :
+                return False
+        return True
+    return False
 
 def get_all_sub_graphs_in_one() -> Graph:
     return Graph("Global", sub_graphs=sub_graphs)
