@@ -34,8 +34,8 @@ def compute(k: int, d: int, subcomplexes: list) -> list:
         a new graph as a list of Vertex or None if it is not possible
     """
 
-    if not is_degree_possible(d, subcomplexes):
-        return None
+    # if not is_degree_possible(d, subcomplexes):
+    #     return None
     subcomplexes = convert(subcomplexes)
     graph = unify(subcomplexes)
     return minimization(k, d, graph)

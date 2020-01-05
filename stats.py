@@ -1,6 +1,6 @@
 from ic.__main__ import random_instance
-# from ic.Algo_one import compute, verify_result
-from ic.Algo_two import compute, verify_result
+from ic.Algo_one import compute, verify_result
+# from ic.Algo_two import compute, verify_result
 
 
 if __name__ == "__main__":

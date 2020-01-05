@@ -10,6 +10,7 @@ from collections import Counter
 from operator import itemgetter
 from ic.Algo_one import is_degree_possible
 
+
 def compute(k: int, delta: int, sg: list, real_list: list = []) -> Graph:
     init(k, delta, sg, real_list)
     if sub_graphs:
@@ -57,17 +58,19 @@ def verify_result(k: int, d: int, graph: Graph) ->bool:
     for v in graph._vertices:
         if v.degree() > d:
             return False
-    if not is_all_subcomplexes_connexes() :
+    if not is_all_subcomplexes_connexes():
         return False
     return True
 
-def is_all_subcomplexes_connexes() -> bool :
-    if sub_graphs :
-        for sg in sub_graphs :
-            if not result.is_connexe(sg) :
+
+def is_all_subcomplexes_connexes() -> bool:
+    if sub_graphs:
+        for sg in sub_graphs:
+            if not result.is_connexe(sg):
                 return False
         return True
     return False
+
 
 def get_all_sub_graphs_in_one() -> Graph:
     return Graph("Global", sub_graphs=sub_graphs)
