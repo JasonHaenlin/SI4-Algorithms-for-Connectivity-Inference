@@ -29,23 +29,23 @@ As part of a university project within the Polytech Nice Sophia Engineering Scho
 
 install numpy
 
-    ```bash
-    # windows
-    pip install numpy
-    # or
-    pip3 install numpy
-    ```
+```bash
+# windows
+pip install numpy
+# or
+pip3 install numpy
+```
 
 ### usage
 
-    ```bash
-    # help
-    python -m ic -h
-    # execute first algo
-    python -m ic -i 100 -p 10 -t 20 -d 5 -k 150 -a 1
-    # execute first algo
-    python -m ic -i 100 -p 10 -t 20 -d 5 -k 150 -a 2
-    ```
+```bash
+# help
+python -m ic -h
+# execute first algo
+python -m ic -i 100 -p 10 -t 20 -d 5 -k 150 -a 1
+# execute first algo
+python -m ic -i 100 -p 10 -t 20 -d 5 -k 150 -a 2
+```
 
 `-i 100` : to run the algorithm 100 times
 
