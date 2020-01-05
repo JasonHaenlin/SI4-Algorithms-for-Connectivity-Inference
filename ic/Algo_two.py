@@ -11,21 +11,13 @@ from operator import itemgetter
 from ic.Algo_one import is_degree_possible
 
 def compute(k: int, delta: int, sg: list, real_list: list = []) -> Graph:
-    if not is_degree_possible(delta, sg):
-        return None
-    #print("compute algo 2")
     init(k, delta, sg, real_list)
     if sub_graphs:
         for sub in sub_graphs:
-            # print(sub)
             tree = get_tree(sub)
-            # print(tree)
             result._add_sub_graph_(tree)
             calculate_delta()
-    # print(result)
     delete_unuseful_edges()
-    #print("edges deleted")
-    # print(result)
     return result
 
 
@@ -39,17 +31,13 @@ def init(k: int, delta: int, sg: list, real_list: list = []):
     sub_graphs = []
     if real_list:
         sub_graphs = real_list
-        # for s in sub_graphs :
-        # print(s)
     else:
         i = 1
         if sg:
             for g in sg:
                 list_vertices = []
-                #print("*******************\nSubgraph {}\n*******************".format(i))
                 for v in g:
                     real_vertex = Vertex(v)
-                    #print(real_vertex)
                     list_vertices.append(real_vertex)
                 real_graph = Graph("Subgraph", True, vertices=list_vertices)
                 sub_graphs.append(real_graph)
@@ -57,7 +45,6 @@ def init(k: int, delta: int, sg: list, real_list: list = []):
     big_graph = get_all_sub_graphs_in_one()
     result = Graph("Result")
     result._reset_()
-    # print(str(big_graph))
 
 
 def verify_result(k: int, d: int, graph: Graph) ->bool:
@@ -112,12 +99,10 @@ def is_vertex_with_max_delta(v: Vertex) -> bool:
 
 
 def get_tree(graph: Graph) -> Graph:
-    #print("actual delta : {} / vertices {}".format(actual_delta, vertices_with_delta_max))
     tree = Graph("Tree")
     tree._reset_()
     edge = get_first_best_edge(graph._edges)
     tree._add_edge_(e=edge)
-    #print("first edge : {}".format(edge))
 
     v1 = edge._v1
     v2 = edge._v2
@@ -130,11 +115,6 @@ def get_tree(graph: Graph) -> Graph:
 
     is_v1_max_delta = is_vertex_with_max_delta(v1)
     is_v2_max_delta = is_vertex_with_max_delta(v2)
-    #print("best {} edge : {}".format(v1._tag, best_edge_v1))
-    #print("best {} edge : {}".format(v2._tag, best_edge_v2))
-    #print("is {} max delta : {}".format(v1._tag, is_v1_max_delta))
-    #print("is {} max delta : {}".format(v2._tag, is_v2_max_delta))
-    # time.sleep(5)
 
     start = None
     best_edge = None
@@ -154,7 +134,6 @@ def get_tree(graph: Graph) -> Graph:
             best_edge = best_edge_v2
 
     change = False
-    #print("best choosen edge : {}".format(best_edge))
     if start and best_edge:
         tree._add_edge_(e=best_edge)
         start = best_edge._get_other_vertex_(start)
@@ -174,7 +153,6 @@ def get_tree(graph: Graph) -> Graph:
 
 
 def get_first_best_edge(edges: list) -> Edge:
-    #print("tree : {}".format(tree))
     edge = None
     if edges:
         edge = edges[0]
@@ -207,9 +185,6 @@ def get_first_best_edge(edges: list) -> Edge:
             tmp_max_delta = 0
             if (not (is_v1_delta_max and is_v2_delta_max)) and (is_v1_delta_max or is_v2_delta_max):
                 tmp_max_delta = 1
-            #print("compare v1 {} : {}".format(edges[i]._v1, tree._has_vertex_(edges[i]._v1)))
-            #print("compare v2 {} : {}".format(edges[i]._v2, tree._has_vertex_(edges[i]._v2)))
-            # print("*****")
             is_weight_greater = tmp_weight > weight
             is_max_vertex_weight_greater = tmp_weight == weight and tmp_max_vertex_weight > max_vertex_weight
             is_min_vertex_weight_lower = tmp_weight == weight and tmp_max_vertex_weight == max_vertex_weight and tmp_min_vertex_weight < min_vertex_weight
@@ -221,22 +196,15 @@ def get_first_best_edge(edges: list) -> Edge:
                 max_vertex_weight = tmp_max_vertex_weight
                 min_vertex_weight = tmp_min_vertex_weight
                 max_delta = tmp_max_delta
-                #print("choose !")
             i += 1
     return edge
 
 
 def get_edge_with_max_weight(edges: list, tree: Graph, source: Vertex) -> Edge:
-    #print("tree : {}".format(tree))
     edge = None
     if edges:
         i = 0
         while not edge and i < len(edges):
-            # "print("choosing first one")
-            #print("v1 {} : {}".format(edges[i]._v1, tree._has_vertex_(edges[i]._v1)))
-            #print("v2 {} : {}".format(edges[i]._v2, tree._has_vertex_(edges[i]._v2)))
-            # print("*****")
-            # time.sleep(1)
             if not tree:
                 edge = edges[i]
             elif not tree._has_vertex_(edges[i]._v1) or not tree._has_vertex_(edges[i]._v2):
@@ -244,15 +212,11 @@ def get_edge_with_max_weight(edges: list, tree: Graph, source: Vertex) -> Edge:
             i += 1
 
         while i < len(edges):
-            #print("compare v1 {} : {}".format(edges[i]._v1, tree._has_vertex_(edges[i]._v1)))
-            #print("compare v2 {} : {}".format(edges[i]._v2, tree._has_vertex_(edges[i]._v2)))
-            # print("*****")
             if not tree or (not tree._has_vertex_(edges[i]._v1) or not tree._has_vertex_(edges[i]._v2)):
                 actual_vertex_weight = edge._get_other_vertex_(source)._weight
                 tmp_vertex_weight = edges[i]._get_other_vertex_(source)._weight
                 if edges[i]._weight > edge._weight or (edges[i]._weight == edge._weight and tmp_vertex_weight < actual_vertex_weight):
                     edge = edges[i]
-                    #print("choose !")
             i += 1
     return edge
 

@@ -28,7 +28,6 @@ class Graph(object):
     """
 
     def __init__(self, name: str, is_complet: bool = False, vertices: list = [], edges: list = [], sub_graphs: list = []):
-        #print("creating {}".format(name))
         self._name = name
         self._vertices = []
         self._edges = []
@@ -46,10 +45,7 @@ class Graph(object):
             if is_complet:
                 for i in range(0, len(self._vertices)-1):
                     for j in range(i+1, len(self._vertices)):
-                        #print("add edge {} {}".format(self._vertices[i], self._vertices[j]))
-                        self._add_edge_(
-                            v1=self._vertices[i], v2=self._vertices[j])
-                        #print ("{}\n{}".format(self._vertices[i], self._vertices[j]))
+                        self._add_edge_(v1=self._vertices[i], v2=self._vertices[j])
             else:
                 self._edges = edges
 
@@ -164,10 +160,8 @@ class Graph(object):
     def is_connexe(self, sg : 'Graph') -> bool :
         if self._vertices and sg and sg._vertices and len(sg._vertices) > 0 :
             source = sg._vertices[0]
-            #print("source : {}".format(source))
             for v in sg._vertices :
                 if source._tag != v._tag :
-                    #print("checking for : {}".format(v))
                     if not self._exists_way_([], source, v, sg) :
                         return False
             return True
@@ -196,7 +190,6 @@ class Graph(object):
         return False
 
     def _exists_way_(self, forbidden_vertices: list, v1: Vertex, v2: Vertex, sg: 'Graph') -> bool:
-        #print("check {} and {}".format(v1,v2))
         if not v1 or not v2:
             return False
 
