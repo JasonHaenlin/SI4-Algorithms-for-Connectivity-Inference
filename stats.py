@@ -1,6 +1,6 @@
 from ic.__main__ import random_instance
-from ic.Algo_one import compute, verify_result
-# from ic.Algo_two import compute, verify_result
+# from ic.Algo_one import compute, verify_result
+from ic.Algo_two import compute, verify_result
 
 
 if __name__ == "__main__":
@@ -8,9 +8,9 @@ if __name__ == "__main__":
     _p = 20
     _t = 10
     _k = {
-        "start": 100,
-        "end": 550,
-        "step": 50,
+        "start": 120,
+        "end": 220,
+        "step": 10,
     }
 
     _d = {

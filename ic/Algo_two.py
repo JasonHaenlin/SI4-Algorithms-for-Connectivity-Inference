@@ -8,8 +8,11 @@ from ic.Edge import Edge
 from ic.Graph import Graph
 from collections import Counter
 from operator import itemgetter
+from ic.Algo_one import is_degree_possible
 
 def compute(k: int, delta: int, sg: list, real_list: list = []) -> Graph:
+    if not is_degree_possible(delta, sg):
+        return None
     #print("compute algo 2")
     init(k, delta, sg, real_list)
     if sub_graphs:
