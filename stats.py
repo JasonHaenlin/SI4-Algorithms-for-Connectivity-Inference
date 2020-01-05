@@ -2,11 +2,10 @@ from ic.__main__ import random_instance
 from ic.Algo_one import compute, verify_result
 # from ic.Algo_two import compute, verify_result
 
-
 if __name__ == "__main__":
     _iteration = 100
     _p = 20
-    _t = 10
+    _t = 20
     _k = {
         "start": 120,
         "end": 220,

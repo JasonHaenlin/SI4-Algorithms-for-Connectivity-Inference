@@ -85,7 +85,10 @@ class Vertex(object):
         self._weight += 1
 
     def _is_there_a_path(self, vertex: Vertex, marked: dict, l: set) -> bool:
-        """check for the current link, if a path back exist"""
+        """check for the current link, if a path back exist
+
+        It is like founding an hamiltonien cycle
+        """
         marked[vertex] = 1
         marked[self] += 1
         if vertex.degree() < 2:
